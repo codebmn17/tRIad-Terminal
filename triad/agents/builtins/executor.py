@@ -16,10 +16,13 @@ class ExecutorAgent(Agent):
     async def handle(self, msg: Message) -> None:
         if msg.sender == self.name:
             return
+        # Only respond to user messages
+        if msg.role != "user":
+            return
         # This is a stub demonstrating safe intents rather than running shell commands.
         suggestion = (
             "I can: "
             + ", ".join(sorted(SAFE_ACTIONS.keys()))
             + ". Reply with 'exec <action> <args>' to proceed."
         )
-        await self.say(msg.room, safe_md(suggestion))
+        await self.say(msg.room, safe_md(suggestion), meta={"icon": self.role.icon})

@@ -13,6 +13,9 @@ class PlannerAgent(Agent):
             return
         if msg.role == "system":
             return
+        # Only respond to user messages or "exec" commands
+        if msg.role != "user" and not msg.content.strip().lower().startswith("exec"):
+            return
         plan = [
             "Clarify the user objective",
             "Break into steps",
@@ -20,4 +23,4 @@ class PlannerAgent(Agent):
             "Propose next action",
         ]
         text = "\n".join(f"- {p}" for p in plan)
-        await self.say(msg.room, safe_md(f"Plan for: {msg.brief()}\n\n{text}"))
+        await self.say(msg.room, safe_md(f"Plan for: {msg.brief()}\n\n{text}"), meta={"icon": self.role.icon})
