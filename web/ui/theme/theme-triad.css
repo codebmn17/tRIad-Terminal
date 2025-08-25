@@ -1,0 +1,230 @@
+/**
+ * Triad Terminal Dark Theme
+ * 
+ * This CSS provides theming for web-based Triad Terminal interfaces.
+ * Automatically applies dark cyberpunk styling with optional background wallpaper
+ * and neon triangle emblem positioning.
+ */
+
+/* CSS Variables for theme colors (matching Python theme definitions) */
+:root {
+  --triad-bg-primary: #0a0a0a;
+  --triad-bg-secondary: #1a1a1a;
+  --triad-fg-primary: #00ff9f;
+  --triad-fg-secondary: #05ffa1;
+  --triad-accent: #00e5ff;
+  --triad-text: #ffffff;
+  --triad-panel: #2a2a2a;
+  --triad-border: #444444;
+  --triad-glow: rgba(0, 255, 159, 0.3);
+}
+
+/* Base theme application */
+body.triad-theme {
+  background: linear-gradient(135deg, 
+    var(--triad-bg-primary) 0%, 
+    var(--triad-bg-secondary) 50%, 
+    #0d0d0d 100%);
+  
+  /* Background wallpaper - fallback to gradient if image missing */
+  background-image: url('/assets/images/triad-terminal-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  
+  /* Overlay gradient to ensure readability */
+  position: relative;
+}
+
+body.triad-theme::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(10, 10, 10, 0.8) 0%, 
+    rgba(26, 26, 26, 0.7) 50%, 
+    rgba(13, 13, 13, 0.8) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Header styling */
+.triad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(42, 42, 42, 0.9);
+  border-bottom: 2px solid var(--triad-fg-primary);
+  box-shadow: 0 0 20px var(--triad-glow);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 10;
+}
+
+.triad-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--triad-glow) 50%, 
+    transparent 100%);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Left side - mask icon */
+.triad-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.triad-header .mask-icon {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 8px var(--triad-glow));
+  transition: all 0.3s ease;
+}
+
+.triad-header .mask-icon:hover {
+  filter: drop-shadow(0 0 12px var(--triad-fg-primary));
+  transform: scale(1.1);
+}
+
+/* Center - title */
+.triad-header .header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.triad-header .title {
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--triad-accent);
+  text-shadow: 0 0 10px var(--triad-accent);
+  letter-spacing: 2px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* Right side - triangle emblem */
+.triad-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.triad-header .triangle-icon {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 8px var(--triad-glow));
+  transition: all 0.3s ease;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.triad-header .triangle-icon:hover {
+  filter: drop-shadow(0 0 15px var(--triad-fg-primary));
+  transform: scale(1.15) rotate(5deg);
+  animation-duration: 0.5s;
+}
+
+/* Pulse animation for triangle */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px var(--triad-glow));
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 12px var(--triad-fg-primary));
+  }
+}
+
+/* General typography for themed content */
+body.triad-theme {
+  color: var(--triad-text);
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  line-height: 1.6;
+}
+
+body.triad-theme h1,
+body.triad-theme h2,
+body.triad-theme h3 {
+  color: var(--triad-accent);
+  text-shadow: 0 0 5px var(--triad-accent);
+}
+
+body.triad-theme a {
+  color: var(--triad-fg-primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+body.triad-theme a:hover {
+  color: var(--triad-fg-secondary);
+  text-shadow: 0 0 8px var(--triad-fg-primary);
+}
+
+/* Panel styling for content areas */
+.triad-panel {
+  background: rgba(42, 42, 42, 0.8);
+  border: 1px solid var(--triad-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.triad-panel.glow {
+  border-color: var(--triad-fg-primary);
+  box-shadow: 0 0 20px var(--triad-glow);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .triad-header {
+    padding: 8px 16px;
+  }
+  
+  .triad-header .title {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+  
+  .triad-header .mask-icon,
+  .triad-header .triangle-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --triad-fg-primary: #00ffaa;
+    --triad-accent: #00ddff;
+    --triad-border: #666666;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .triad-header .triangle-icon {
+    animation: none;
+  }
+  
+  * {
+    transition: none !important;
+  }
+}
