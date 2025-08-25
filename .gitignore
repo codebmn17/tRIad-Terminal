@@ -38,3 +38,4 @@ ENV/
 # OS files
 .DS_Store
 Thumbs.db.triad_example/
+.triad_test/
