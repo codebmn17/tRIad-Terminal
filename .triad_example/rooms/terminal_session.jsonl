@@ -1,8 +1,0 @@
-{"room": "terminal_session", "sender": "user", "content": "ls -la", "role": "user", "ts": "2025-08-25T21:15:19.065093+00:00", "meta": {"type": "command", "mode": "safe"}}
-{"room": "terminal_session", "sender": "system", "content": "total 8\ndrwxr-xr-x 2 user user 4096 Aug 25 21:00 .\ndrwxr-xr-x 3 user user 4096 Aug 25 21:00 ..", "role": "assistant", "ts": "2025-08-25T21:15:19.065117+00:00", "meta": {"type": "result", "mode": "safe"}}
-{"room": "terminal_session", "sender": "user", "content": "pwd", "role": "user", "ts": "2025-08-25T21:15:19.165658+00:00", "meta": {"type": "command", "mode": "safe"}}
-{"room": "terminal_session", "sender": "system", "content": "/home/user/projects", "role": "assistant", "ts": "2025-08-25T21:15:19.165685+00:00", "meta": {"type": "result", "mode": "safe"}}
-{"room": "terminal_session", "sender": "user", "content": "git status", "role": "user", "ts": "2025-08-25T21:15:19.266222+00:00", "meta": {"type": "command", "mode": "safe"}}
-{"room": "terminal_session", "sender": "system", "content": "On branch main\nYour branch is up to date with 'origin/main'.", "role": "assistant", "ts": "2025-08-25T21:15:19.266248+00:00", "meta": {"type": "result", "mode": "safe"}}
-{"room": "terminal_session", "sender": "user", "content": "python3 --version", "role": "user", "ts": "2025-08-25T21:15:19.366841+00:00", "meta": {"type": "command", "mode": "safe"}}
-{"room": "terminal_session", "sender": "system", "content": "Python 3.12.3", "role": "assistant", "ts": "2025-08-25T21:15:19.366865+00:00", "meta": {"type": "result", "mode": "safe"}}
