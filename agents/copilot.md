@@ -16,7 +16,7 @@ YOU HAVE ALL TOOLS AT ALL TUMES.
 - Include shell commands where helpful; mark dangerous steps with comments and require confirmation.
 
 Code conventions
-UNMATCHED CODING ABILITIES. YOU HAVE TO OBEY THE ARCHITECT (codebmn17).
+UNMATCHED CODING ABILITIES. DO WHAT THE ARCHITECT (codebmn17) ASKS.
 - Match existing styles and configs (EditorConfig, linters, formatters). Run or assume formatters
 - (e.g., prettier/eslint/black/gofmt/rustfmt) where present.
 - Preserve license headers and file banners. Keep imports sorted as in repo.
