@@ -7,19 +7,19 @@ import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.neighbors import KNeighborsClassifier
 
-# Cache target names at module import to avoid repeated dataset loads
+# Cache target names once to avoid repeated dataset loads
 _TARGET_NAMES = load_iris().target_names
 
 # Artifact path and in-memory cache
 _ARTIFACT = Path(__file__).resolve().parent.parent / "models" / "iris_knn.joblib"
 _MODEL: KNeighborsClassifier | None = None
 
-_FEATURE_NAMES = [
+_FEATURE_NAMES = (
     "sepal_length",
     "sepal_width",
     "petal_length",
     "petal_width",
-]
+)
 
 def _ensure_models_dir() -> None:
     models_dir = _ARTIFACT.parent
@@ -46,6 +46,15 @@ def _ensure_model() -> KNeighborsClassifier:
     return _MODEL
 
 def _validate_x(x: List[float]) -> List[float]:
+    # Accept list, tuple, or numpy array
+    if isinstance(x, np.ndarray):
+        if x.ndim != 1 or x.size != 4:
+            raise ValueError("x must be a 1D array of length 4")
+        try:
+            return x.astype(float).ravel().tolist()
+        except (ValueError, TypeError) as e:
+            raise ValueError("x must contain only numeric values") from e
+
     if not isinstance(x, (list, tuple)):
         raise ValueError("x must be a list or tuple of 4 numeric features")
     if len(x) != 4:
@@ -68,14 +77,14 @@ def predict(x: List[float]) -> Dict[str, Any]:
     xf = _validate_x(x)
     model = _ensure_model()
 
-    class_ids = list(model.classes_)
+    class_ids = list(model.classes_)  # e.g., [0,1,2]
 
-    X = np.array([xf], dtype=float)
+    X = np.asarray([xf], dtype=float)
     probs = model.predict_proba(X)[0]
     pred_idx = int(np.argmax(probs))
     pred_label = _TARGET_NAMES[class_ids[pred_idx]]
 
-    proba_map = {_TARGET_NAMES[c]: float(probs[i]) for i, c in enumerate(class_ids)}
+    proba_map = {_TARGET_NAMES[c]: float(p) for c, p in zip(class_ids, probs)}
     features_map = {name: float(val) for name, val in zip(_FEATURE_NAMES, xf)}
 
     return {
