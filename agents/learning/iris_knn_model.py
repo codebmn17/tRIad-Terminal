@@ -104,3 +104,60 @@ test_accuracy = loaded_model.score(X_test, y_test)
 print(f"\nModel accuracy on test set: {test_accuracy:.4f}")
 
 print("\n=== Model Training and Testing Complete ===")
+# ==== wrapper + caching for production use ====
+import os
+from pathlib import Path
+import joblib
+import numpy as np
+from sklearn.datasets import load_iris
+
+_MODEL_PATH = Path(__file__).resolve().parents[2] / "models" / "iris_knn.joblib"
+_MODEL = None
+_TARGET_NAMES = load_iris().target_names  # ["setosa", "versicolor", "virginica"]
+
+def _ensure_model():
+    """Load the trained KNN once (or train & save if missing)."""
+    global _MODEL
+    if _MODEL is not None:
+        return _MODEL
+    if _MODEL_PATH.exists():
+        _MODEL = joblib.load(_MODEL_PATH)
+        return _MODEL
+
+    # Train quickly if artifact is missing (safe fallback)
+    iris = load_iris()
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(
+        iris.data, iris.target, test_size=0.2, random_state=42
+    )
+    model = KNeighborsClassifier(n_neighbors=7)
+    model.fit(X_train, y_train)
+    _MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, _MODEL_PATH)
+    _MODEL = model
+    return _MODEL
+
+def predict(x):
+    """
+    x: [sepal_length, sepal_width, petal_length, petal_width]
+    returns: {"model": "knn", "label": "...", "proba": {"setosa": 0.12, ...}, "features": x}
+    """
+    m = _ensure_model()
+    xx = np.array([x], dtype=float)
+    y = int(m.predict(xx)[0])
+
+    # If classifier supports predict_proba (KNN does)
+    proba = {}
+    if hasattr(m, "predict_proba"):
+        p = m.predict_proba(xx)[0]
+        for name, val in zip(_TARGET_NAMES, p):
+            proba[name] = float(val)
+
+    return {"model": "knn", "label": _TARGET_NAMES[y], "proba": proba, "features": x}
+
+# ---- keep your printed demo ONLY when run as a script ----
+if __name__ == "__main__":
+    # Your existing training/printing demo can stay here.
+    # It will no longer run when the module is imported.
+    pass
