@@ -1,4 +1,4 @@
-# Triad Terminal
+#🔺️Triad Terminal🔻
 
 A Python-first, extensible terminal environment that integrates:
 - Enhanced shell and environment helpers
