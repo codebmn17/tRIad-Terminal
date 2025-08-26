@@ -4,7 +4,13 @@ import json
 from typing import List, Dict, Any, Optional
 
 # ---- load model JSON ----
-with open("unstoppable_iris_model.json", "r", encoding="utf-8") as f:
+from pathlib import Path
+import json
+
+HERE = Path(__file__).resolve().parent
+MODEL_PATH = (HERE / ".." / ".." / "agents" / "learning" / "unstoppable_iris_model.json").resolve()
+
+with open(MODEL_PATH, "r", encoding="utf-8") as f:
     MODEL = json.load(f)
 
 FEATURE_NAMES: List[str] = MODEL.get("feature_names") or []
