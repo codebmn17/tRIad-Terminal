@@ -1,0 +1,573 @@
+# We'll try to load the uploaded pickle, introspect the model, and export a fully transparent JSON + YAML.
+
+import os, json, sys, pickle, types, math, textwrap, gzip, base64
+
+from pathlib import Path
+
+
+
+pkl_path = Path("/mnt/data/unstoppable_iris_model.pkl")
+
+
+
+summary = {}
+
+
+
+if not pkl_path.exists():
+
+    print("File not found at", pkl_path)
+
+else:
+
+    # Try multiple loaders in a safe-ish way
+
+    model = None
+
+    load_errors = []
+
+    for loader in ("pickle",):
+
+        try:
+
+            with open(pkl_path, "rb") as f:
+
+                model = pickle.load(f)
+
+            used_loader = loader
+
+            break
+
+        except Exception as e:
+
+            load_errors.append((loader, repr(e)))
+
+            model = None
+
+
+
+    summary["load_used"] = used_loader if model is not None else None
+
+    summary["load_errors"] = load_errors
+
+
+
+    # Helper to recursively export a sklearn tree into a nested dict
+
+    def export_decision_tree(tree, class_names=None, feature_names=None):
+
+        import numpy as np
+
+        t = tree.tree_
+
+        # children_left/right, feature, threshold, value
+
+        # We'll build nodes array by index, and link as nested dict from root (0)
+
+        def node_to_dict(i):
+
+            node = {
+
+                "node_index": int(i),
+
+                "samples": int(t.n_node_samples[i]),
+
+                "impurity": float(t.impurity[i]),
+
+            }
+
+            feat_idx = t.feature[i]
+
+            thr = t.threshold[i]
+
+            if feat_idx != -2:
+
+                feat_name = (
+
+                    feature_names[feat_idx]
+
+                    if feature_names is not None and 0 <= feat_idx < len(feature_names)
+
+                    else int(feat_idx)
+
+                )
+
+                node["split"] = {
+
+                    "feature_index": int(feat_idx),
+
+                    "feature_name": feat_name,
+
+                    "threshold": float(thr),
+
+                    "go_left_if": f"{feat_name} <= {float(thr)}",
+
+                    "go_right_if": f"{feat_name} > {float(thr)}",
+
+                }
+
+                left = t.children_left[i]
+
+                right = t.children_right[i]
+
+                node["left"] = node_to_dict(left)
+
+                node["right"] = node_to_dict(right)
+
+            # leaf
+
+            values = t.value[i][0]
+
+            node["class_counts"] = [int(v) for v in values]
+
+            if class_names is not None:
+
+                # probability per class
+
+                total = float(sum(values))
+
+                if total > 0:
+
+                    probs = [float(v/total) for v in values]
+
+                else:
+
+                    probs = [0.0 for _ in values]
+
+                node["class_probabilities"] = dict(zip([str(c) for c in class_names], probs))
+
+                node["majority_class"] = str(class_names[int(values.argmax())]) if hasattr(values, "argmax") else None
+
+            return node
+
+        return node_to_dict(0)
+
+
+
+    export = {"meta": {}, "model": {}}
+
+    if model is not None:
+
+        export["meta"]["type"] = type(model).__name__
+
+        export["meta"]["module"] = type(model).__module__
+
+        export["meta"]["repr"] = repr(model)[:500]
+
+        # Try to detect sklearn structures
+
+        try:
+
+            import sklearn
+
+            export["meta"]["sklearn_version"] = sklearn.__version__
+
+        except Exception as e:
+
+            export["meta"]["sklearn_version"] = None
+
+
+
+        # feature names if present
+
+        feature_names = getattr(model, "feature_names_in_", None)
+
+        if feature_names is not None:
+
+            feature_names = [str(x) for x in feature_names]
+
+        classes = getattr(model, "classes_", None)
+
+        if classes is not None:
+
+            classes = [str(c) for c in list(classes)]
+
+        export["model"]["classes"] = classes
+
+        export["model"]["feature_names"] = feature_names
+
+
+
+        # Handle common sklearn ensemble/tree types
+
+        from typing import Any
+
+        def try_random_forest_like(m: Any):
+
+            # has estimators_ collection of DecisionTreeClassifiers
+
+            if hasattr(m, "estimators_"):
+
+                try:
+
+                    trees = []
+
+                    for idx, est in enumerate(m.estimators_):
+
+                        trees.append({
+
+                            "tree_index": idx,
+
+                            "tree": export_decision_tree(est, class_names=classes, feature_names=feature_names)
+
+                        })
+
+                    return {
+
+                        "kind": "EnsembleOfTrees",
+
+                        "n_estimators": len(m.estimators_),
+
+                        "criterion": getattr(m, "criterion", None),
+
+                        "max_depth": getattr(m, "max_depth", None),
+
+                        "n_features_in_": getattr(m, "n_features_in_", None),
+
+                        "trees": trees
+
+                    }
+
+                except Exception as e:
+
+                    return {"kind": "UnknownTreeEnsemble", "error": repr(e)}
+
+            return None
+
+
+
+        # DecisionTreeClassifier
+
+        def try_single_tree(m: Any):
+
+            if hasattr(m, "tree_"):
+
+                try:
+
+                    return {
+
+                        "kind": "SingleDecisionTree",
+
+                        "criterion": getattr(m, "criterion", None),
+
+                        "max_depth": getattr(m, "max_depth", None),
+
+                        "n_features_in_": getattr(m, "n_features_in_", None),
+
+                        "tree": export_decision_tree(m, class_names=classes, feature_names=feature_names)
+
+                    }
+
+                except Exception as e:
+
+                    return {"kind": "UnknownTree", "error": repr(e)}
+
+            return None
+
+
+
+        structured = None
+
+        # Try common wrappers
+
+        for probe in (try_random_forest_like, try_single_tree):
+
+            try:
+
+                structured = probe(model)
+
+                if structured is not None:
+
+                    break
+
+            except Exception as e:
+
+                pass
+
+
+
+        # If it's something like a Pipeline or VotingClassifier, unwrap
+
+        if structured is None:
+
+            # Try pipeline
+
+            if hasattr(model, "steps"):
+
+                export["model"]["pipeline_steps"] = [name for name, _ in model.steps]
+
+                # Try last step
+
+                try:
+
+                    last_est = model.steps[-1][1]
+
+                    for probe in (try_random_forest_like, try_single_tree):
+
+                        structured = probe(last_est)
+
+                        if structured is not None:
+
+                            break
+
+                except Exception as e:
+
+                    structured = {"kind":"UnknownWithinPipeline","error":repr(e)}
+
+
+
+            # Try Voting/Bagging
+
+            if structured is None and hasattr(model, "estimators_"):
+
+                structured = try_random_forest_like(model)
+
+
+
+        if structured is None:
+
+            # last resort: raw dump via __dict__
+
+            try:
+
+                raw = {}
+
+                for k,v in vars(model).items():
+
+                    try:
+
+                        # keep primitives and small lists
+
+                        if isinstance(v, (str, int, float, bool, type(None))):
+
+                            raw[k]=v
+
+                        elif isinstance(v, (list, tuple)) and len(v) <= 10 and all(isinstance(x,(str,int,float,bool,type(None))) for x in v):
+
+                            raw[k]=v
+
+                        else:
+
+                            raw[k]=f"<<{type(v).__name__}>>"
+
+                    except Exception:
+
+                        pass
+
+                structured = {"kind":"OpaqueModel","attributes":raw}
+
+            except Exception as e:
+
+                structured = {"kind":"Unrecognized", "error": repr(e)}
+
+
+
+        export["model"]["structure"] = structured
+
+
+
+        # Derive a tiny pure-Python predictor for tree/forest
+
+        py_impl_lines = []
+
+        def emit_tree_predict(fn_name, tree_dict, class_list):
+
+            # recursive emit
+
+            lines = []
+
+            indent = "    "
+
+            def emit_node(node, level):
+
+                ind = indent*level
+
+                if "split" in node:
+
+                    feat_idx = node["split"]["feature_index"]
+
+                    thr = node["split"]["threshold"]
+
+                    lines.append(f"{ind}if x[{feat_idx}] <= {thr!r}:")
+
+                    emit_node(node["left"], level+1)
+
+                    lines.append(f"{ind}else:")
+
+                    emit_node(node["right"], level+1)
+
+                else:
+
+                    # leaf – return argmax
+
+                    probs = node.get("class_probabilities", None)
+
+                    if probs is not None and class_list is not None:
+
+                        # Return index of max prob
+
+                        # Keep deterministic tie-break by max count
+
+                        lines.append(f"{ind}return {class_list}[{node['class_counts'].index(max(node['class_counts']))}]")
+
+                    else:
+
+                        lines.append(f"{ind}return {node.get('majority_class', 0)!r}")
+
+            lines.append(f"def {fn_name}(x):")
+
+            emit_node(tree_dict, 1)
+
+            return "\n".join(lines)
+
+
+
+        mini_py = None
+
+        try:
+
+            if structured["kind"] == "SingleDecisionTree":
+
+                mini_py = emit_tree_predict("tree_predict", structured["tree"], classes or ["0","1","2"])
+
+            elif structured["kind"] == "EnsembleOfTrees":
+
+                # simple majority vote across trees
+
+                votes_fns = []
+
+                for i, t in enumerate(structured["trees"][:10]):  # only emit first 10 for size
+
+                    fn_name = f"tree_{i}_predict"
+
+                    votes_fns.append(fn_name)
+
+                    py_impl_lines.append(emit_tree_predict(fn_name, t["tree"], classes or ["0","1","2"]))
+
+                class_list = classes or ["0","1","2"]
+
+                vote_code = [
+
+                    "from collections import Counter",
+
+                    f"CLASSES = {class_list!r}",
+
+                    "def forest_predict(x):",
+
+                    f"    preds = [{', '.join([f'{fn}(x)' for fn in votes_fns])}]",
+
+                    "    c = Counter(preds)",
+
+                    "    return c.most_common(1)[0][0]"
+
+                ]
+
+                py_impl_lines.extend(vote_code)
+
+            if mini_py:
+
+                py_impl_lines.append(mini_py)
+
+        except Exception as e:
+
+            py_impl_lines = [f"# Could not emit Python predictor: {repr(e)}"]
+
+
+
+        # Write JSON + YAML + minimal python
+
+        out_json = Path("/mnt/data/unstoppable_iris_model.json")
+
+        out_yaml = Path("/mnt/data/unstoppable_iris_model.yaml")
+
+        out_py   = Path("/mnt/data/unstoppable_iris_model_min.py")
+
+
+
+        with open(out_json, "w", encoding="utf-8") as f:
+
+            json.dump(export, f, indent=2)
+
+
+
+        try:
+
+            import yaml
+
+            with open(out_yaml, "w", encoding="utf-8") as f:
+
+                yaml.safe_dump(export, f, sort_keys=False)
+
+        except Exception as e:
+
+            # If PyYAML not installed in this environment, emit a simple YAML ourselves
+
+            y = json.dumps(export, indent=2)
+
+            with open(out_yaml, "w", encoding="utf-8") as f:
+
+                f.write("# YAML representation unavailable (PyYAML missing); JSON content below.\n")
+
+                f.write(y)
+
+
+
+        with open(out_py, "w", encoding="utf-8") as f:
+
+            f.write("\n\n".join(py_impl_lines) if py_impl_lines else "# No python emission available")
+
+
+
+        # Basic human summary
+
+        import pprint
+
+        human = []
+
+        human.append("UNSTOPPABLE IRIS MODEL — TRANSLATION SUMMARY")
+
+        human.append("="*52)
+
+        human.append(f"Loaded via: {summary['load_used']}")
+
+        human.append(f"Model type: {export['meta']['module']}.{export['meta']['type']}")
+
+        human.append(f"Classes: {classes}")
+
+        human.append(f"Feature names: {feature_names}")
+
+        kind = export["model"]["structure"]["kind"]
+
+        human.append(f"Structure kind: {kind}")
+
+        if kind == "EnsembleOfTrees":
+
+            human.append(f"Estimators: {export['model']['structure'].get('n_estimators')}")
+
+            human.append(f"Criterion: {export['model']['structure'].get('criterion')}")
+
+            human.append(f"Max depth: {export['model']['structure'].get('max_depth')}")
+
+        elif kind == "SingleDecisionTree":
+
+            human.append(f"Criterion: {export['model']['structure'].get('criterion')}")
+
+            human.append(f"Max depth: {export['model']['structure'].get('max_depth')}")
+
+
+
+        report_path = Path("/mnt/data/unstoppable_iris_REPORT.txt")
+
+        report_path.write_text("\n".join(human), encoding="utf-8")
+
+
+
+        print("Export complete.")
+
+        print("JSON:", out_json)
+
+        print("YAML:", out_yaml)
+
+        print("Python:", out_py)
+
+        print("Summary:", report_path)
