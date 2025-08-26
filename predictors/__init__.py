@@ -1,8 +1,6 @@
-"""Predictors package for Iris models.
+from __future__ import annotations
 
-Usage:
-    from predictors.knn import predict as knn_predict
-    from predictors.forest import predict as forest_predict
-"""
+from .knn import predict as predict_knn
+from .forest import predict as predict_forest
 
-__all__ = ["knn", "forest"]
+__all__ = ["predict_knn", "predict_forest"]
