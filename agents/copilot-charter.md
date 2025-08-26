@@ -109,7 +109,7 @@ Onboarding Checklist
 - Read this charter and agents/copilot.md.
 - Set up local tooling (formatter, linter, tests).
 - Review recent PRs to learn patterns.
-- Do a first "low-risk" PR using Copilot with a maintainer shadow.
+- Do a first “low-risk” PR using Copilot with a maintainer shadow.
 
 References
 - GitHub Copilot policies and docs: https://docs.github.com/copilot
