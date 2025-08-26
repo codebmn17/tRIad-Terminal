@@ -7,6 +7,9 @@ import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.neighbors import KNeighborsClassifier
 
+# Cache target names at module import to avoid repeated dataset loads
+_TARGET_NAMES = load_iris().target_names
+
 # Artifact path and in-memory cache
 _ARTIFACT = Path(__file__).resolve().parent.parent / "models" / "iris_knn.joblib"
 _MODEL: KNeighborsClassifier | None = None
@@ -49,7 +52,7 @@ def _validate_x(x: List[float]) -> List[float]:
         raise ValueError("x must have length 4: [sepal_length, sepal_width, petal_length, petal_width]")
     try:
         xf = [float(v) for v in x]
-    except Exception as e:
+    except (ValueError, TypeError) as e:
         raise ValueError("x must contain only numeric values") from e
     return xf
 
@@ -65,17 +68,14 @@ def predict(x: List[float]) -> Dict[str, Any]:
     xf = _validate_x(x)
     model = _ensure_model()
 
-    # Map class indices to iris target names
-    iris = load_iris()
     class_ids = list(model.classes_)
-    target_names = iris.target_names
 
     X = np.array([xf], dtype=float)
     probs = model.predict_proba(X)[0]
     pred_idx = int(np.argmax(probs))
-    pred_label = target_names[class_ids[pred_idx]]
+    pred_label = _TARGET_NAMES[class_ids[pred_idx]]
 
-    proba_map = {target_names[c]: float(probs[i]) for i, c in enumerate(class_ids)}
+    proba_map = {_TARGET_NAMES[c]: float(probs[i]) for i, c in enumerate(class_ids)}
     features_map = {name: float(val) for name, val in zip(_FEATURE_NAMES, xf)}
 
     return {
