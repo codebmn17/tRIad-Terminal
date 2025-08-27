@@ -1,3 +1,4 @@
+# Triad Terminal
 #🔺️Triad Terminal🔻
 
 A Python-first, extensible terminal environment that integrates:
@@ -27,6 +28,30 @@ python triad-terminal.py
 python optimized_terminal.py
 ```
 
+## Development
+
+- Formatting and linting: Ruff + Black (configured via pyproject.toml)
+- Pre-commit hooks: see .pre-commit-config.yaml
+- CI: GitHub Actions runs lint checks on push/PR
+
+## Project layout (selected)
+
+```
+.
+├── .github/workflows/         # CI workflows
+├── docs/                      # Architecture and contribution docs
+├── scripts/                   # Dev helper scripts
+├── *.py                       # Existing Python modules (Version1/Version2 coexist)
+├── *.js, *.sh                 # Installer/runner helpers
+└── README.md
+```
+
+## Roadmap (proposed)
+- Package under src/triad_terminal/ with typed modules
+- Single, canonical implementations (remove Version* duplicates)
+- Add tests and coverage gates in CI
+- Optional releases and packaging if distribution is desired
+=======
 ## Web browsing (Brave preferred)
 
 We ship a small helper that prefers Brave Browser if installed and falls back to the system default. See docs/BRAVE.md for installation instructions.
