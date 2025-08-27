@@ -143,3 +143,8 @@ dmypy.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Model artifacts (keep .gitkeep only)
+models/*.joblib
+models/*.pkl
+!models/.gitkeep
