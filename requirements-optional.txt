@@ -1,0 +1,3 @@
+# Optional niceties for future extensions (not required for terminal core)
+# rich>=13.0.0
+# aiohttp>=3.9.0  # for a future web chat
