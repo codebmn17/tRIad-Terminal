@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from .core import Router
+
+# Re-export Router as the main rooms interface
+__all__ = ["Router"]
 import asyncio
 from collections import defaultdict
 from typing import Dict, List, Set

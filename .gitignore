@@ -1,3 +1,12 @@
+
+# Triad Terminal data directories
+.triad/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 # Python cache files
 __pycache__/
 *.py[cod]
@@ -20,6 +29,14 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
 
 # PyInstaller
 *.manifest
@@ -52,6 +69,11 @@ venv.bak/
 .idea/
 *.swp
 *.swo
+
+# OS files
+.DS_Store
+Thumbs.db.triad_example/
+.triad_test/
 *~
 
 # OS
@@ -62,7 +84,6 @@ venv.bak/
 .Trashes
 ehthumbs.db
 Thumbs.db
-=======
 # Python
 __pycache__/
 *.py[cod]
