@@ -1,4 +1,5 @@
 # Triad Terminal
+#🔺️Triad Terminal🔻
 
 A Python-first, extensible terminal environment that integrates:
 - Enhanced shell and environment helpers
@@ -50,3 +51,29 @@ python optimized_terminal.py
 - Single, canonical implementations (remove Version* duplicates)
 - Add tests and coverage gates in CI
 - Optional releases and packaging if distribution is desired
+=======
+## Web browsing (Brave preferred)
+
+We ship a small helper that prefers Brave Browser if installed and falls back to the system default. See docs/BRAVE.md for installation instructions.
+
+```python
+from utils.browser import open_url
+open_url("https://example.com")
+```
+
+## Converting .docx artifacts
+
+If you see files like `main.py.docx` or `devenv.js.docx`, use the converter to generate proper source files while keeping the originals:
+
+```bash
+pip install -r requirements-dev.txt
+python tools/convert_docx.py
+```
+
+See docs/CONVERSION.md for details.
+
+## Development
+
+- Formatting and linting: Ruff + Black (configured via pyproject.toml)
+- Pre-commit hooks: see .pre-commit-config.yaml
+- CI: GitHub Actions runs lint checks on push/PR
