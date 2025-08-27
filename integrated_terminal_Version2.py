@@ -5,12 +5,31 @@
 Triad Terminal with Voice Integration
 Combines security, enhanced UI, and voice capabilities
 """
-import pip install 
-import pyttsx3 
-import SpeechRecognition 
-import pyaudio 
-import gtts 
-import playsound
+# Optional imports with fallbacks
+try:
+    import pyttsx3
+except ImportError:
+    pyttsx3 = None
+
+try:
+    import speech_recognition
+except ImportError:
+    speech_recognition = None
+
+try:
+    import pyaudio
+except ImportError:
+    pyaudio = None
+
+try:
+    from gtts import gTTS
+except ImportError:
+    gTTS = None
+
+try:
+    import playsound
+except ImportError:
+    playsound = None
 import os
 import sys
 import time

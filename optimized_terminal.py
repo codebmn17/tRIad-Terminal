@@ -542,23 +542,23 @@ def plugins_create(plugin_name):
     
     # Create plugin.py
     with open(os.path.join(plugin_dir, "plugin.py"), "w") as f:
-        f.write("""import click
+        f.write(f"""import click
 
 class Plugin:
-    """A Triad Terminal plugin"""
+    \"\"\"A Triad Terminal plugin\"\"\"
     
     def __init__(self):
-        self.name = "PLUGIN_NAME"
+        self.name = "{plugin_name}"
     
     def get_commands(self):
-        """Return a list of click commands this plugin provides"""
+        \"\"\"Return a list of click commands this plugin provides\"\"\"
         @click.command()
         def hello():
-            """Say hello from the plugin"""
-            click.echo(f"Hello from {self.name} plugin!")
+            \"\"\"Say hello from the plugin\"\"\"
+            click.echo(f"Hello from {{self.name}} plugin!")
         
         return [hello]
-""".replace("PLUGIN_NAME", plugin_name))
+""")
     
     if has_rich:
         Console().print(f"[bold {ui.current_theme['success']}]✅ Plugin {plugin_name} created[/]")
