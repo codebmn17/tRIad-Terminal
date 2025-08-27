@@ -62,3 +62,48 @@ venv.bak/
 .Trashes
 ehthumbs.db
 Thumbs.db
+=======
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.build/
+.dist/
+.eggs/
+.so
+
+# Virtualenv
+.env
+.venv
+venv/
+ENV/
+
+# Packaging
+build/
+dist/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / frontend
+node_modules/
+dist/
+.cache/
+
+# Editor
+.vscode/
+.idea/
+
+# Local env
+.env.local
+.env.*.local
+
+# Models
+models/*.joblib
+models/*.pkl

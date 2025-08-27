@@ -1,0 +1,29 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E","F","I","UP","B","W"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = false
+warn_unused_configs = true
+strict_optional = false
+
+[project]
+name = "triad-terminal"
+description = "Triad Terminal — extensible terminal with shell, repo, security, voice/AI."
+requires-python = ">=3.11"
