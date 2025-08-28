@@ -1,5 +1,1 @@
-"""API package initialization."""
-
-from .main import app
-
-__all__ = ["app"]
+# Intentionally empty package initializer.
