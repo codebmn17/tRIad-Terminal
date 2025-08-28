@@ -56,7 +56,7 @@ class VoiceManager:
                         config[key] = value
                 return config
             except Exception as e:
-                logger.error(f"Error loading voice config: {e}")
+                logger.error("Error loading voice config: {e}")
         
         # If no config file or error, use defaults and create config
         self._save_config(self.default_config)
@@ -120,7 +120,7 @@ class VoiceManager:
                 def say(self, text):
                     try:
                         # Generate unique filename
-                        temp_file = os.path.join(self.temp_dir, f"tts_{hash(text) & 0xffffffff}.mp3")
+                        temp_file = os.path.join(self.temp_dir, "tts_{hash(text) & 0xffffffff}.mp3")
                         
                         # Generate speech
                         tts = gTTS(text=text, lang='en', slow=(self.rate < 0.9))
@@ -208,16 +208,16 @@ class VoiceManager:
                 try:
                     # Use Google's speech recognition
                     text = self.stt_engine.recognize_google(audio)
-                    logger.info(f"Recognized: {text}")
+                    logger.info("Recognized: {text}")
                     return text
                 except sr.UnknownValueError:
                     logger.info("Speech not understood")
                     return None
                 except sr.RequestError as e:
-                    logger.error(f"Speech recognition service error: {e}")
+                    logger.error("Speech recognition service error: {e}")
                     return None
         except Exception as e:
-            logger.error(f"Error during speech recognition: {e}")
+            logger.error("Error during speech recognition: {e}")
             return None
     
     def listen_for_trigger(self, callback: Callable[[str], None], stop_event: threading.Event) -> None:
@@ -231,7 +231,7 @@ class VoiceManager:
             import speech_recognition as sr
             
             with sr.Microphone() as source:
-                logger.info(f"Listening for trigger phrase: '{trigger_phrase}'")
+                logger.info("Listening for trigger phrase: '{trigger_phrase}'")
                 self.stt_engine.adjust_for_ambient_noise(source)
                 
                 while not stop_event.is_set():
@@ -239,7 +239,7 @@ class VoiceManager:
                         audio = self.stt_engine.listen(source, timeout=1, phrase_time_limit=3)
                         try:
                             text = self.stt_engine.recognize_google(audio).lower()
-                            logger.info(f"Heard: {text}")
+                            logger.info("Heard: {text}")
                             
                             if trigger_phrase in text:
                                 logger.info("Trigger phrase detected")
@@ -356,7 +356,7 @@ class VoiceManager:
                 wf.setframerate(44100)
                 wf.writeframes(array.array('h', chord[0]).tobytes())
             
-            logger.info(f"Generated notification sound: {output_file}")
+            logger.info("Generated notification sound: {output_file}")
         except ImportError:
             logger.warning("synthesizer not available, cannot generate notification sounds")
             # Create an empty file as a placeholder
@@ -441,7 +441,7 @@ class VoiceCommands:
             
         else:
             # Generic query handling
-            return f"I heard you say: {text}. This command isn't fully implemented yet."
+            return "I heard you say: {text}. This command isn't fully implemented yet."
     
     def _help_command(self) -> str:
         """Handle help command"""
@@ -455,24 +455,24 @@ class VoiceCommands:
         
         # Handle common targets
         if "project" in target:
-            return f"Opening project manager"
+            return "Opening project manager"
         elif "terminal" in target or "shell" in target:
-            return f"Opening terminal"
+            return "Opening terminal"
         elif "editor" in target or "code" in target:
-            return f"Opening code editor"
+            return "Opening code editor"
         elif "browser" in target or "web" in target:
-            return f"Opening web browser"
+            return "Opening web browser"
         elif "settings" in target or "preferences" in target:
-            return f"Opening settings"
+            return "Opening settings"
         else:
-            return f"Opening {target}"
+            return "Opening {target}"
     
     def _deploy_command(self, project: str, target: str) -> str:
         """Handle deploy command"""
         if not project:
             return "Please specify what project you'd like to deploy."
         
-        return f"Starting deployment of {project} to {target}"
+        return "Starting deployment of {project} to {target}"
     
     def _status_command(self, target: str) -> str:
         """Handle status command"""
@@ -485,4 +485,4 @@ class VoiceCommands:
         elif "project" in target:
             return "Project status: 3 projects active"
         else:
-            return f"Status of {target}: Unknown"
+            return "Status of {target}: Unknown"
