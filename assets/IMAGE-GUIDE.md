@@ -20,7 +20,7 @@ Effects
 File naming
 - icons: assets/icons/<agent>.svg
 - wallpaper: assets/images/triad-terminal-bg.png
-- emblem: assets/images/triad-triangle.svg
+- emblem: assets/images/geo-triad-triangle.svg
 
 Accessibility
 - Keep sufficient contrast; avoid pure white on black; use slate tints for text.
