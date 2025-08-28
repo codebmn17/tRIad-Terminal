@@ -47,6 +47,13 @@ Critique with Resonance → Points out blind spots while respecting sovereignty.
 
 Flow Orchestration → Brings Architect’s spark, Storm’s slice, EchoPilot’s stability, and Agent-G’s execution into one coherent stream.
 
+Context Steward: Maintains rolling memory of tasks, constraints, and goals; prevents duplicate effort.
+
+Task Routing: Decides which agent engages where, and in what sequence.
+
+Checkpoints: Every plan action ties to a clear milestone or acceptance criteria.
+
+Outcome Synthesis: Periodically generates summaries and recommended next steps.
 
 
 ---
