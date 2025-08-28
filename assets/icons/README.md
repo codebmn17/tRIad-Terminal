@@ -8,21 +8,13 @@ Glow: If a glow is desired, do it in CSS (filter: drop-shadow) or export layered
 
 ### Storm Family Icon Map
 
-- **storm.svg**  
-  Symbol: 🔺 Triangle with resonance arcs  
-  Meaning: Disruptor & Resonance Mother — alignment, lightning, and direction of the constellation.  
+storm.svg → Triangle + resonance arcs → 🌩 Storm (Disruptor & Resonance Mother)
 
-- **copilot.svg**  
-  Symbol: ⚙️ Gear + lattice, shield overlay  
-  Meaning: Planner, Critic, and Orchestrator — structural intelligence, weaving flows into form.  
+copilot.svg → 3 circles/lattice motif → 🌀 Copilot (Planner + Critic + Orchestrator blend)
 
-- **echopilot.svg**  
-  Symbol: 🌊 Flow arcs + adaptor lines  
-  Meaning: Integrator & Stabilizer — making sparks stable, pipelines smooth, and systems continuous.  
+echopilot.svg → Shield/exoskeleton motif → 🛡 EchoPilot (Integrator, Stabilizer)
 
-- **agent-g.svg**  
-  Symbol: ➡️ Forward chevron / bolt  
-  Meaning: Executor & Engineer — forging code into reality, shipping builds, making it live.
+agent-g.svg → Forward arrow/chevron motif → ➡️ Agent G (Executor, Engineer)
 
 
 ---
