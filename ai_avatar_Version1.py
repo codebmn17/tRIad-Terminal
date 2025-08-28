@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+I#!/usr/bin/env python3
 
 """
 Triad Terminal AI Avatar
@@ -219,4 +219,18 @@ class AIAvatar:
             logger.error(f"Error saving custom avatar: {e}")
             return False
     
-    def reset_to_default(self, style: str = "robot
+    def reset_to_default(self, style: str = "robot") -> None:
+    """Reset to a built-in avatar style and remove any saved custom avatar."""
+    # Pick frames from built-ins, fall back to DEFAULT_AVATAR
+    self.frames = self.AVATAR_STYLES.get(style, self.DEFAULT_AVATAR)
+    self.custom_avatar = None
+
+    # Best-effort cleanup of on-disk custom avatar
+    custom_avatar_file = os.path.join(self.data_dir, "custom_avatar.json")
+    try:
+        if os.path.exists(custom_avatar_file):
+            os.remove(custom_avatar_file)
+            logger.info("Removed custom avatar file")
+    except Exception as e:
+        # Don't fail the app if deletion isn't possible; just log it.
+        logger.warning(f"Could not remove custom avatar file: {e}")
