@@ -135,7 +135,7 @@ class VoiceManager:
                         except:
                             pass
                     except Exception as e:
-                        logger.error(f"TTS error: {e}")
+                        logger.error("TTS error: {e}")
                 
                 def runAndWait(self):
                     pass  # Not needed for this wrapper
