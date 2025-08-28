@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
+
 """
-Backward compatibility shim for assistant-ML.py
+Triad Terminal AI Assistant
+Provides intelligent code completion and command prediction
+"""
 
 import os
 import re
@@ -37,32 +40,6 @@ except ImportError:
 
 logger = logging.getLogger("triad.ai")
 
-
-def log_with_context(level: str, message: str, component: str, event: str, **kwargs) -> None:
-    """
-    Structured logging helper with context information.
-    
-    Args:
-        level: Log level (info, warning, error, debug)
-        message: Log message
-        component: Component name (e.g., 'predictor', 'nl_processor', 'code_engine')
-        event: Event type (e.g., 'prediction', 'training', 'initialization')
-        **kwargs: Additional context data
-    """
-    context = {
-        "component": component,
-        "event": event,
-        **kwargs
-    }
-    
-    log_message = f"[{component}:{event}] {message}"
-    if context:
-        context_str = " | ".join(f"{k}={v}" for k, v in kwargs.items() if v is not None)
-        if context_str:
-            log_message += f" | {context_str}"
-    
-    getattr(logger, level.lower())(log_message)
-
 class CodeCompletionEngine:
     """Engine for providing code completions"""
     
@@ -88,8 +65,7 @@ class CodeCompletionEngine:
     def _load_models(self) -> None:
         """Load trained models if available"""
         if not HAS_SKLEARN:
-            log_with_context("warning", "scikit-learn not available, code completion will be limited", 
-                            "code_engine", "initialization")
+            logger.warning("scikit-learn not available, code completion will be limited")
             return
             
         for language in self.supported_languages:
@@ -98,11 +74,9 @@ class CodeCompletionEngine:
             if os.path.exists(vectorizer_path):
                 try:
                     self.vectorizers[language] = joblib.load(vectorizer_path)
-                    log_with_context("info", f"Loaded vectorizer for {language}", 
-                                    "code_engine", "initialization", language=language)
+                    logger.info(f"Loaded vectorizer for {language}")
                 except Exception as e:
-                    log_with_context("error", f"Failed to load vectorizer for {language}", 
-                                    "code_engine", "initialization", language=language, error=str(e))
+                    logger.error(f"Failed to load vectorizer for {language}: {e}")
             
             # Load simple completion model
             model_path = os.path.join(self.model_dir, f"{language}_completion_model.pkl")
@@ -514,12 +488,10 @@ class CommandPredictor:
                 self.command_sequences = data.get("sequences", {})
                 self.command_contexts = data.get("contexts", {})
                 
-                log_with_context("info", f"Loaded {len(self.commands)} commands from history", 
-                                "predictor", "initialization", commands_count=len(self.commands))
+                logger.info(f"Loaded {len(self.commands)} commands from history")
                 
             except Exception as e:
-                log_with_context("error", "Error loading command history", 
-                                "predictor", "initialization", error=str(e))
+                logger.error(f"Error loading command history: {e}")
                 self._initialize_empty_history()
         else:
             self._initialize_empty_history()
@@ -726,90 +698,6 @@ class CommandPredictor:
                         break
         
         return suggestions[:max_suggestions]
-    
-    def train(self, force: bool = False) -> Dict[str, Any]:
-        """
-        Train the command prediction model.
-        
-        Args:
-            force: If True, force retraining even if recent training exists
-            
-        Returns:
-            Dict containing training status and statistics
-        """
-        start_time = time.time()
-        
-        # Get before stats
-        before_stats = {
-            "commands_count": len(self.commands),
-            "unique_commands": len(self.command_frequencies),
-            "sequences_count": len(self.command_sequences),
-            "model_trained": self.model is not None
-        }
-        
-        log_with_context("info", "Starting command predictor training", "predictor", "training",
-                        force=force, commands_count=before_stats["commands_count"])
-        
-        try:
-            # Check if we have enough data
-            if len(self.commands) < 10:
-                return {
-                    "success": False,
-                    "message": "Insufficient training data (need at least 10 commands)",
-                    "before_stats": before_stats,
-                    "after_stats": before_stats,
-                    "training_time_ms": (time.time() - start_time) * 1000
-                }
-            
-            # Check if recent training exists and force is not set
-            if not force and hasattr(self, '_last_training_time'):
-                time_since_training = time.time() - self._last_training_time
-                if time_since_training < 3600:  # Less than 1 hour ago
-                    return {
-                        "success": False,
-                        "message": f"Recent training exists ({time_since_training/60:.1f} minutes ago). Use force=True to retrain",
-                        "before_stats": before_stats,
-                        "after_stats": before_stats,
-                        "training_time_ms": (time.time() - start_time) * 1000
-                    }
-            
-            # Retrain the model
-            self._initialize_model()
-            self._last_training_time = time.time()
-            
-            # Get after stats
-            after_stats = {
-                "commands_count": len(self.commands),
-                "unique_commands": len(self.command_frequencies),
-                "sequences_count": len(self.command_sequences),
-                "model_trained": self.model is not None
-            }
-            
-            training_time_ms = (time.time() - start_time) * 1000
-            
-            log_with_context("info", "Command predictor training completed", "predictor", "training",
-                            training_time_ms=training_time_ms, 
-                            unique_commands=after_stats["unique_commands"])
-            
-            return {
-                "success": True,
-                "message": "Command predictor trained successfully",
-                "before_stats": before_stats,
-                "after_stats": after_stats,
-                "training_time_ms": training_time_ms
-            }
-            
-        except Exception as e:
-            error_msg = f"Training failed: {str(e)}"
-            log_with_context("error", error_msg, "predictor", "training", error=str(e))
-            
-            return {
-                "success": False,
-                "message": error_msg,
-                "before_stats": before_stats,
-                "after_stats": before_stats,
-                "training_time_ms": (time.time() - start_time) * 1000
-            }
 
 
 class NaturalLanguageProcessor:
@@ -1287,298 +1175,30 @@ class AIAssistant:
             self.nl_processor.add_training_example(nl_command, intent, executed_command)
     
     def _guess_intent(self, command: str) -> Optional[str]:
-        """Guess intent from executed command with enhanced pattern recognition"""
-        if not command:
-            return None
-            
-        command_lower = command.lower()
+        """Guess intent from executed command"""
         command_start = command.split()[0] if command else ""
         
-        # Enhanced command to intent mapping
+        # Map common commands to intents
         command_intent_map = {
-            # File operations
-            "ls": "list_files", "ll": "list_files", "dir": "list_files",
-            "find": "find_files", "locate": "find_files", "which": "find_files",
-            "mkdir": "create_directory", "md": "create_directory",
-            "rm": "remove_file", "rmdir": "remove_file", "del": "remove_file",
-            "cat": "show_file", "less": "show_file", "more": "show_file", "head": "show_file", "tail": "show_file",
-            "nano": "edit_file", "vim": "edit_file", "vi": "edit_file", "emacs": "edit_file", "code": "edit_file",
-            "cp": "copy_file", "copy": "copy_file", "mv": "move_file", "move": "move_file",
-            "chmod": "change_permissions", "chown": "change_ownership",
-            
-            # Git commands
-            "git": "git_operation",
-            
-            # Package managers
-            "pip": "package_management", "pip3": "package_management",
-            "npm": "package_management", "yarn": "package_management",
-            "apt": "package_management", "apt-get": "package_management",
-            "yum": "package_management", "dnf": "package_management",
-            "brew": "package_management", "conda": "package_management",
-            
-            # System monitoring
-            "ps": "process_status", "top": "process_status", "htop": "process_status",
-            "df": "disk_usage", "du": "disk_usage", "lsblk": "disk_usage",
-            "free": "memory_usage", "vmstat": "memory_usage",
-            "netstat": "network_status", "ss": "network_status", "lsof": "network_status",
-            "systemctl": "service_management", "service": "service_management",
-            "crontab": "scheduling", "at": "scheduling",
-            
-            # Network diagnostics
-            "ping": "network_diagnostic", "curl": "network_diagnostic", "wget": "network_diagnostic",
-            "ssh": "remote_connection", "scp": "file_transfer", "rsync": "file_transfer",
-            "telnet": "network_diagnostic", "nslookup": "network_diagnostic", "dig": "network_diagnostic",
-            
-            # Archive/compression
-            "tar": "archive_operation", "zip": "compress", "unzip": "extract",
-            "gzip": "compress", "gunzip": "extract", "bzip2": "compress", "bunzip2": "extract",
-            
-            # Python tooling
-            "python": "python_execution", "python3": "python_execution", "py": "python_execution",
-            "pytest": "testing", "unittest": "testing", "coverage": "testing",
-            "black": "code_formatting", "flake8": "code_analysis", "pylint": "code_analysis",
-            "mypy": "type_checking", "isort": "import_sorting",
-            
-            # Development tools
-            "make": "build_system", "cmake": "build_system", "gradle": "build_system",
-            "docker": "containerization", "kubectl": "container_orchestration",
-            "node": "javascript_execution", "npm": "package_management",
+            "ls": "list_files",
+            "find": "find_files",
+            "mkdir": "create_directory",
+            "rm": "remove_file",
+            "cat": "show_file",
+            "nano": "edit_file",
+            "vim": "edit_file",
+            "ps": "process_status",
+            "df": "disk_usage",
+            "free": "memory_usage",
+            "netstat": "network_status",
+            "tar": "compress" if "-c" in command else "extract"
         }
         
-        # First try direct command mapping
-        base_intent = command_intent_map.get(command_start)
-        if base_intent:
-            # Refine based on command patterns and flags
-            return self._refine_intent_with_patterns(base_intent, command_lower)
-        
-        # Pattern-based heuristics for complex commands
-        intent = self._guess_intent_from_patterns(command_lower)
-        if intent:
-            return intent
-            
-        log_with_context("debug", f"No intent found for command", "assistant", "intent_detection", 
-                        command=command_start)
-        return None
+        return command_intent_map.get(command_start)
     
-    def _refine_intent_with_patterns(self, base_intent: str, command: str) -> str:
-        """Refine intent based on command patterns and flags"""
-        
-        # Git operation refinements
-        if base_intent == "git_operation":
-            if any(x in command for x in ["clone", "pull", "fetch"]):
-                return "git_sync"
-            elif any(x in command for x in ["add", "commit", "push"]):
-                return "git_commit"
-            elif any(x in command for x in ["branch", "checkout", "merge"]):
-                return "git_branching"
-            elif any(x in command for x in ["status", "log", "diff"]):
-                return "git_info"
-            return "git_operation"
-        
-        # Archive operation refinements
-        if base_intent == "archive_operation":
-            if "-c" in command or "create" in command:
-                return "compress"
-            elif "-x" in command or "extract" in command:
-                return "extract"
-            elif "-t" in command or "list" in command:
-                return "list_archive"
-            return "archive_operation"
-        
-        # Package management refinements
-        if base_intent == "package_management":
-            if any(x in command for x in ["install", "add"]):
-                return "install_package"
-            elif any(x in command for x in ["remove", "uninstall", "delete"]):
-                return "remove_package"
-            elif any(x in command for x in ["update", "upgrade"]):
-                return "update_package"
-            elif any(x in command for x in ["list", "search", "show"]):
-                return "query_package"
-            return "package_management"
-        
-        return base_intent
-    
-    def _guess_intent_from_patterns(self, command: str) -> Optional[str]:
-        """Guess intent from command patterns and content"""
-        
-        # File extension patterns
-        if any(ext in command for ext in [".py", "*.py", "python"]):
-            return "python_operation"
-        
-        if any(ext in command for ext in [".js", "*.js", ".json", "node"]):
-            return "javascript_operation"
-            
-        # Flag-based patterns
-        if "-rf" in command and any(cmd in command for cmd in ["rm", "delete"]):
-            return "force_remove"
-            
-        if "grep" in command or "awk" in command or "sed" in command:
-            return "text_processing"
-            
-        if "|" in command and any(cmd in command for cmd in ["sort", "uniq", "wc"]):
-            return "data_processing"
-            
-        # Path patterns
-        if any(path in command for path in ["/var/log", "/tmp", "/etc"]):
-            return "system_administration"
-            
-        return None
-    
-    def train_models(self, force: bool = False, components: List[str] = ["all"]) -> Dict[str, Any]:
-        """
-        Train all models with enhanced capabilities.
-        
-        Args:
-            force: Force retraining even if recent training exists
-            components: List of components to train ('code', 'commands', 'nl', 'all')
-            
-        Returns:
-            Dict containing training results for all components
-        """
-        start_time = time.time()
-        results = {
-            "success": True,
-            "message": "Training completed",
-            "components_trained": [],
-            "before_stats": {},
-            "after_stats": {},
-            "training_time_ms": 0
-        }
-        
-        # Determine which components to train
-        train_all = "all" in components
-        train_components = {
-            "code": train_all or "code" in components,
-            "commands": train_all or "commands" in components,
-            "nl": train_all or "nl" in components
-        }
-        
-        log_with_context("info", "Starting model training", "assistant", "training",
-                        components=components, force=force)
-        
-        # Collect before stats
-        results["before_stats"] = self.status()
-        
-        try:
-            # Train code completion engine
-            if train_components["code"]:
-                try:
-                    self.code_engine.train_models(background=False)
-                    results["components_trained"].append("code")
-                    log_with_context("info", "Code engine training completed", "assistant", "training")
-                except Exception as e:
-                    log_with_context("error", f"Code engine training failed: {e}", "assistant", "training")
-                    results["success"] = False
-            
-            # Train command predictor
-            if train_components["commands"]:
-                try:
-                    cmd_result = self.command_predictor.train(force=force)
-                    if cmd_result["success"]:
-                        results["components_trained"].append("commands")
-                        log_with_context("info", "Command predictor training completed", "assistant", "training")
-                    else:
-                        log_with_context("warning", f"Command predictor training failed: {cmd_result['message']}", 
-                                        "assistant", "training")
-                        if "insufficient" in cmd_result["message"].lower():
-                            # Not a real failure, just insufficient data
-                            pass
-                        else:
-                            results["success"] = False
-                except Exception as e:
-                    log_with_context("error", f"Command predictor training failed: {e}", "assistant", "training")
-                    results["success"] = False
-            
-            # Train NL processor
-            if train_components["nl"]:
-                try:
-                    # The NL processor is trained incrementally, just reinitialize models
-                    self.nl_processor._initialize_models()
-                    results["components_trained"].append("nl")
-                    log_with_context("info", "NL processor training completed", "assistant", "training")
-                except Exception as e:
-                    log_with_context("error", f"NL processor training failed: {e}", "assistant", "training")
-                    results["success"] = False
-            
-        except Exception as e:
-            log_with_context("error", f"Training failed: {e}", "assistant", "training")
-            results["success"] = False
-            results["message"] = f"Training failed: {str(e)}"
-        
-        # Collect after stats
-        results["after_stats"] = self.status()
-        results["training_time_ms"] = (time.time() - start_time) * 1000
-        
-        if results["success"]:
-            results["message"] = f"Training completed successfully for components: {', '.join(results['components_trained'])}"
-        
-        return results
-    
-    def status(self) -> Dict[str, Any]:
-        """
-        Get comprehensive status of the AI assistant.
-        
-        Returns:
-            Dict containing detailed status information
-        """
-        try:
-            # Basic capability check
-            capabilities = ["command_prediction", "natural_language_processing", "code_completion"]
-            
-            # Check model status
-            models_loaded = {
-                "command_predictor": self.command_predictor.model is not None,
-                "nl_classifier": getattr(self.nl_processor, 'classifier', None) is not None,
-                "code_engine": len(self.code_engine.language_models) > 0
-            }
-            
-            # Training readiness
-            training_ready = (
-                len(self.command_predictor.commands) >= 5 and  # Minimum command history
-                len(self.nl_processor.intent_patterns) > 0  # Has intent patterns
-            )
-            
-            # Intent mapping size
-            intent_mapping_size = len(self.nl_processor.intent_patterns)
-            
-            # Get last training time if available
-            last_trained = None
-            if hasattr(self.command_predictor, '_last_training_time'):
-                last_trained = datetime.fromtimestamp(self.command_predictor._last_training_time)
-            
-            return {
-                "enabled": True,
-                "models_loaded": any(models_loaded.values()),
-                "training_ready": training_ready,
-                "intent_mapping_size": intent_mapping_size,
-                "last_trained": last_trained,
-                "capabilities": capabilities,
-                "model_details": models_loaded,
-                "component_stats": {
-                    "commands_in_history": len(self.command_predictor.commands),
-                    "unique_commands": len(self.command_predictor.command_frequencies),
-                    "intent_patterns": len(self.nl_processor.intent_patterns),
-                    "command_templates": len(self.nl_processor.command_templates),
-                    "code_models": len(self.code_engine.language_models)
-                },
-                "ml_availability": {
-                    "sklearn": HAS_SKLEARN,
-                    "tensorflow": HAS_TENSORFLOW
-                }
-            }
-            
-        except Exception as e:
-            log_with_context("error", f"Error getting status: {e}", "assistant", "status")
-            return {
-                "enabled": False,
-                "models_loaded": False,
-                "training_ready": False,
-                "intent_mapping_size": 0,
-                "last_trained": None,
-                "capabilities": [],
-                "error": str(e)
-            }
+    def train_models(self) -> None:
+        """Train all models"""
+        self.code_engine.train_models(background=True)
 
 def main() -> None:
     """Test the AI assistant"""
@@ -1611,13 +1231,6 @@ def main() -> None:
     print(f"Result: {nl_result}")
     
     print("\nAI Assistant test complete")
-=======
-This file has been renamed to assistant_ml.py to follow Python naming conventions.
-Please update your imports to use 'assistant_ml' instead of 'assistant-ML'.
-"""
 
-raise ImportError(
-    "The file 'assistant-ML.py' has been renamed to 'assistant_ml.py' to follow Python naming conventions. "
-    "Please update your import to: 'from agents.learning.assistant_ml import ...' "
-    "instead of 'from agents.learning.assistant-ML import ...'"
-)
+if __name__ == "__main__":
+    main()
