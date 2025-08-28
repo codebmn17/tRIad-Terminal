@@ -219,8 +219,12 @@ class AIAvatar:
             logger.error(f"Error saving custom avatar: {e}")
             return False
     
-    def reset_to_default(self, style: str = "robot") -> None:
-    """Reset to a built-in avatar style and remove any saved custom avatar."""
+def reset_to_default(self, style: str = "robot") -> None:
+    """Reset to a built-in avatar style and remove any saved custom avatar.
+
+    Args:
+        style (str): Which built-in style to use (e.g., "robot").
+    """
     # Pick frames from built-ins, fall back to DEFAULT_AVATAR
     self.frames = self.AVATAR_STYLES.get(style, self.DEFAULT_AVATAR)
     self.custom_avatar = None
@@ -232,5 +236,5 @@ class AIAvatar:
             os.remove(custom_avatar_file)
             logger.info("Removed custom avatar file")
     except Exception as e:
-        # Don't fail the app if deletion isn't possible; just log it.
+        # Don’t fail the app if deletion isn’t possible; just log it
         logger.warning(f"Could not remove custom avatar file: {e}")
