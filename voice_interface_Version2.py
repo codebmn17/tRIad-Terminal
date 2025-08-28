@@ -68,7 +68,7 @@ class VoiceManager:
             with open(self.config_file, "w") as f:
                 json.dump(config, f, indent=2)
         except Exception as e:
-            logger.error(f"Error saving voice config: {e}")
+            logger.error("Error saving voice config: {e}")
     
     def _init_voice_engines(self) -> None:
         """Initialize text-to-speech and speech recognition engines"""
