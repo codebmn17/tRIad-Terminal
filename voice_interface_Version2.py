@@ -12,9 +12,10 @@ import time
 import logging
 import threading
 import tempfile
-from typing import Dict, List, Any, Optional, Callable, Union
+from typing import Dict, Tuple, List, Any, Optional, Callable, Union
+from __future__ import annotations
 
-logger = logging.getLogger("triad.voice")
+from typing import Tuple, Optional, List, Dict  # add Tuple at least; trim unused later
 
 class VoiceManager:
     """Manages voice interaction capabilities"""
