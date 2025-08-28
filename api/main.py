@@ -10,7 +10,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import health, ml_router
+from .routers import health, ml_router, assistant
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -34,6 +34,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(health.router, tags=["health"])
     app.include_router(ml_router.router, prefix="/ml", tags=["machine-learning"])
+    app.include_router(assistant.router, prefix="/assistant", tags=["ai-assistant"])
 
     return app
 
