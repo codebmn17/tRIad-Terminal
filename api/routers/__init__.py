@@ -1,5 +1,1 @@
-"""Router package initialization."""
-
-from . import health, ml_router, assistant
-
-__all__ = ["health", "ml_router", "assistant"]
+# Intentionally empty to mark routers package.

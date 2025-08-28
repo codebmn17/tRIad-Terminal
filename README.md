@@ -72,6 +72,22 @@ python tools/convert_docx.py
 
 See docs/CONVERSION.md for details.
 
+## Performance Baseline
+
+Triad Terminal includes built-in performance instrumentation to help measure and optimize performance. See [docs/performance_baseline.md](docs/performance_baseline.md) for detailed instructions on gathering baseline metrics.
+
+**Quick start:**
+```bash
+# Enable performance logging
+export TRIAD_PERF=1
+
+# Run with timing
+time python triad-terminal.py --help
+
+# Check performance summary in terminal
+/perf
+```
+
 ## Development
 
 - Formatting and linting: Ruff + Black (configured via pyproject.toml)
