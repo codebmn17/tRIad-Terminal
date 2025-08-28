@@ -10,6 +10,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .routers import health, ml_router, assistant
 from .routers import health, ml_router
 from . import ml_status, assistant
 
