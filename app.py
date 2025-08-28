@@ -1,67 +1,50 @@
+from __future__ import annotations
+
+from typing import List
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import json
-from typing import List, Dict, Any, Optional
+from pydantic import BaseModel, Field, validator
+from fastapi.middleware.cors import CORSMiddleware
 
-# ---- load model JSON ----
-from pathlib import Path
-import json
+from models import predict_knn, predict_forest
 
-HERE = Path(__file__).resolve().parent
-MODEL_PATH = (HERE / ".." / ".." / "agents" / "learning" / "unstoppable_iris_model.json").resolve()
+app = FastAPI(title="Triad Learning API", version="1.0.0")
 
-with open(MODEL_PATH, "r", encoding="utf-8") as f:
-    MODEL = json.load(f)
+# Allow browser tests from a file:// page and any local app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Dev-friendly. Lock down later if needed.
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-FEATURE_NAMES: List[str] = MODEL.get("feature_names") or []
-CLASSES: List[str] = MODEL.get("classes") or []
-TREE = MODEL["tree"]  # nested dict: {feature:int, threshold:float, left:node, right:node, value:[counts...]}
+class FeaturesIn(BaseModel):
+    features: List[float] = Field(..., description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]")
 
-# ---- traversal ----
-def predict_from_tree(x_by_idx: List[float]) -> Dict[str, Any]:
-    node = TREE
-    while "value" not in node:
-        feat_idx = node["feature"]
-        thr = node["threshold"]
-        node = node["left"] if x_by_idx[feat_idx] <= thr else node["right"]
-    counts = node["value"]  # e.g. [n_setosa, n_versicolor, n_virginica]
-    total = max(sum(counts), 1)
-    probs = [c / total for c in counts]
-    pred_idx = int(max(range(len(probs)), key=lambda i: probs[i]))
-    return {
-        "class_index": pred_idx,
-        "class_label": CLASSES[pred_idx] if CLASSES else str(pred_idx),
-        "probs": { (CLASSES[i] if i < len(CLASSES) else str(i)): probs[i] for i in range(len(probs)) },
-        "leaf_counts": counts,
-    }
+    @validator("features")
+    def check_len_and_numbers(cls, v):
+        if len(v) != 4:
+            raise ValueError("features must be a list of exactly 4 numbers")
+        try:
+            [float(x) for x in v]
+        except Exception as e:
+            raise ValueError("features must be numeric") from e
+        return v
 
-# ---- API ----
-class PredictBody(BaseModel):
-    # Either send "features" as an ordered list matching feature_names,
-    # OR send "by_name" as a dict {feature_name: value}
-    features: Optional[List[float]] = None
-    by_name: Optional[Dict[str, float]] = None
+@app.get("/")
+def root():
+    return {"ok": True, "message": "Triad Learning API is running", "endpoints": ["/predict/knn", "/predict/forest"]}
 
-app = FastAPI(title="Iris Model API", version="1.0")
+@app.post("/predict/knn")
+def predict_knn_endpoint(inp: FeaturesIn):
+    try:
+        return predict_knn(inp.features)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-@app.get("/meta")
-def meta():
-    return {
-        "model_type": MODEL.get("model_type", "tree"),
-        "feature_names": FEATURE_NAMES,
-        "classes": CLASSES,
-    }
-
-@app.post("/predict")
-def predict(body: PredictBody):
-    if body.by_name:
-        if not FEATURE_NAMES:
-            raise HTTPException(400, "Model lacks feature_names; use 'features' array instead.")
-        x = [float(body.by_name.get(name, 0.0)) for name in FEATURE_NAMES]
-    elif body.features:
-        x = list(map(float, body.features))
-    else:
-        raise HTTPException(400, "Provide 'features' (array) or 'by_name' (dict).")
-
-    res = predict_from_tree(x)
-    return {"ok": True, "prediction": res}
+@app.post("/predict/forest")
+def predict_forest_endpoint(inp: FeaturesIn):
+    try:
+        return predict_forest(inp.features)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
