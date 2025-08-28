@@ -35,18 +35,19 @@ def get_perf_logger() -> logging.Logger:
         # Check if we should auto-elevate to INFO level
         if os.environ.get("TRIAD_PERF"):
             logger.setLevel(logging.INFO)
+
+            # Create simple formatter for timing logs
+            formatter = logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            )
+
+            # Add console handler
+            handler = logging.StreamHandler()
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
         else:
+            # Set to DEBUG level but don't add handlers - effectively dormant
             logger.setLevel(logging.DEBUG)
-
-        # Create simple formatter for timing logs
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-
-        # Add console handler if none exists
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
 
         # Prevent propagation to root logger to avoid duplicate messages
         logger.propagate = False
