@@ -180,7 +180,7 @@ class VoiceManager:
                 self.tts_engine.say(text)
                 self.tts_engine.runAndWait()
             except Exception as e:
-                logger.error(f"TTS error: {e}")
+                logger.error("TTS error: {e}")
         
         if blocking:
             _speak_thread()
@@ -259,7 +259,7 @@ class VoiceManager:
                         # Any other error, just continue
                         time.sleep(0.1)
         except Exception as e:
-            logger.error(f"Error in trigger listener: {e}")
+            logger.error("Error in trigger listener: {e}")
     
     def start_voice_assistant(self, command_handler: Callable[[str], str]) -> threading.Event:
         """Start voice assistant in background thread"""
@@ -320,7 +320,7 @@ class VoiceManager:
         except ImportError:
             logger.warning("playsound not available, notification sounds disabled")
         except Exception as e:
-            logger.error(f"Error playing notification sound: {e}")
+            logger.error("Error playing notification sound: {e}")
     
     def _generate_notification_sound(self, sound_type: str, output_file: str) -> None:
         """Generate a simple notification sound"""
