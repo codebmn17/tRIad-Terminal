@@ -1,0 +1,5 @@
+# Default owner(s) for everything
+* @codebmn17
+# Optional: add paths for agents or docs if you want stricter review gates
+# /agents/ @codebmn17
+# /triad/ @codebmn17
