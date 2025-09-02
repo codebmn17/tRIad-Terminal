@@ -16,15 +16,7 @@ repos:
         args: ["--fix"]
         exclude: |
           (?x)(
-            ^tests/api_tester.py$
-            |^triad-terminal.py$
-            |^utils/browser.py$
-            |^triad_terminal/commands/perf.py$
-            |^triad_terminal/agents/memory.py$
-            |^triad_terminal/agents/cli_chat.py$
-            |^triad_terminal/agents/builtins/planner.py$
-            |^triad_terminal/agents/registry.py$
-            |^src_main.py$
+            ^tests/api_tester.html$
           )
 
   - repo: https://github.com/psf/black
@@ -34,13 +26,5 @@ repos:
         language_version: python3
         exclude: |
           (?x)(
-            ^tests/api_tester.py$
-            |^triad-terminal.py$
-            |^utils/browser.py$
-            |^triad_terminal/commands/perf.py$
-            |^triad_terminal/agents/memory.py$
-            |^triad_terminal/agents/cli_chat.py$
-            |^triad_terminal/agents/builtins/planner.py$
-            |^triad_terminal/agents/registry.py$
-            |^src_main.py$
+            ^tests/api_tester.html$
           )
