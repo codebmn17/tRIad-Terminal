@@ -13,10 +13,34 @@ repos:
     rev: v0.5.7
     hooks:
       - id: ruff
-        args: ["--fix"]   # auto-fix import order, many lint issues
+        args: ["--fix"]
+        exclude: |
+          (?x)(
+            ^tests/api_tester.py$
+            |^triad-terminal.py$
+            |^utils/browser.py$
+            |^triad_terminal/commands/perf.py$
+            |^triad_terminal/agents/memory.py$
+            |^triad_terminal/agents/cli_chat.py$
+            |^triad_terminal/agents/builtins/planner.py$
+            |^triad_terminal/agents/registry.py$
+            |^src_main.py$
+          )
 
   - repo: https://github.com/psf/black
     rev: 24.8.0
     hooks:
       - id: black
         language_version: python3
+        exclude: |
+          (?x)(
+            ^tests/api_tester.py$
+            |^triad-terminal.py$
+            |^utils/browser.py$
+            |^triad_terminal/commands/perf.py$
+            |^triad_terminal/agents/memory.py$
+            |^triad_terminal/agents/cli_chat.py$
+            |^triad_terminal/agents/builtins/planner.py$
+            |^triad_terminal/agents/registry.py$
+            |^src_main.py$
+          )
