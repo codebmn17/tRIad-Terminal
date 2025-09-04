@@ -8,6 +8,7 @@ natural language processing, code completion, and training.
 import pytest
 from fastapi.testclient import TestClient
 
+"""
 Test AI Assistant API endpoints.
 
 Tests the /assistant endpoints for command prediction, code completion,
@@ -301,7 +302,7 @@ class TestAssistantSchemaValidation:
             assert isinstance(data["before_stats"], dict)
             assert isinstance(data["after_stats"], dict)
             assert isinstance(data["training_time_ms"], (int, float))
-=======
+
 class TestAssistantStatusEndpoint:
     """Test assistant status endpoint."""
     
