@@ -39,11 +39,11 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Include existing v1 routers
-    app.include_router(health.router, tags=["health"])
+    # Include existing v1 routers  
     app.include_router(ml_router.router, prefix="/ml", tags=["machine-learning"])
     app.include_router(ml_status.router, prefix="/ml", tags=["ml-status"])
     app.include_router(assistant.router, prefix="/assistant", tags=["ai-assistant"])
+    # Note: health router provides the old root endpoint, override with new one
 
     # Include new v2 API routers
     app.include_router(multi_assistant_router, prefix="/api/v2")

@@ -35,11 +35,20 @@ def discover_builtin_agents() -> Dict[str, Type[Agent]]:
     except ImportError:
         pass
     
+    # Add a simple chat agent for demonstrations
     try:
-        from .builtins.recorder import RecorderAgent
-        registry["RecorderAgent"] = RecorderAgent
+        from .builtins.utils import create_simple_agent
+        ChatAgent = create_simple_agent("ChatAgent", "I assist with general conversations")
+        registry["ChatAgent"] = ChatAgent
     except ImportError:
         pass
+    
+    # Skip RecorderAgent for now as it requires special initialization
+    # try:
+    #     from .builtins.recorder import RecorderAgent
+    #     registry["RecorderAgent"] = RecorderAgent
+    # except ImportError:
+    #     pass
     
     return registry
 
