@@ -5,7 +5,7 @@ from .utils import safe_md
 from ..core import Agent, Message, Role
 
 
-class PlannerAgent(Agent)
+class PlannerAgent(Agent):
     """Agent that helps plan tasks and break them down."""
 
     def __init__(self, name: str = "planner"):
