@@ -11,15 +11,20 @@
       "metadata": {
         "language": "python",
         "task": "code_search",
-        "license": "MIT"
+        "license": "MIT",
+        "document_types": null,
+        "extra": null
       },
       "phases": {
-        "download": "pending",
-        "normalize": "pending", 
-        "embed": "pending"
+        "download": "completed",
+        "normalize": "completed",
+        "embed": "completed"
       },
       "created_at": "2025-01-01T00:00:00Z",
-      "updated_at": "2025-01-01T00:00:00Z"
+      "updated_at": "2025-09-05T07:51:37.378571",
+      "ready": true,
+      "error_message": null,
+      "progress": null
     },
     {
       "id": "wiki_history_events",
@@ -32,15 +37,20 @@
       "metadata": {
         "language": "en",
         "task": "historical_qa",
-        "license": "CC-BY-SA"
+        "license": "CC-BY-SA",
+        "document_types": null,
+        "extra": null
       },
       "phases": {
-        "download": "pending",
-        "normalize": "pending",
-        "embed": "pending"
+        "download": "skipped",
+        "normalize": "skipped",
+        "embed": "completed"
       },
       "created_at": "2025-01-01T00:00:00Z",
-      "updated_at": "2025-01-01T00:00:00Z"
+      "updated_at": "2025-09-05T07:51:35.507097",
+      "ready": true,
+      "error_message": null,
+      "progress": null
     },
     {
       "id": "sec_filings_sample",
@@ -51,19 +61,27 @@
       "sample_size": 200,
       "format": "jsonl",
       "metadata": {
-        "document_types": ["10-K", "10-Q"],
+        "language": null,
         "task": "financial_analysis",
-        "license": "Public Domain"
+        "license": "Public Domain",
+        "document_types": [
+          "10-K",
+          "10-Q"
+        ],
+        "extra": null
       },
       "phases": {
-        "download": "pending",
-        "normalize": "pending",
-        "embed": "pending"
+        "download": "skipped",
+        "normalize": "skipped",
+        "embed": "completed"
       },
       "created_at": "2025-01-01T00:00:00Z",
-      "updated_at": "2025-01-01T00:00:00Z"
+      "updated_at": "2025-09-05T07:51:35.521457",
+      "ready": true,
+      "error_message": null,
+      "progress": null
     }
   ],
   "version": "1.0.0",
-  "last_updated": "2025-01-01T00:00:00Z"
+  "last_updated": "2025-09-05T07:51:37.378695"
 }

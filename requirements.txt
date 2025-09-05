@@ -3,6 +3,13 @@ uvicorn[standard]>=0.30.0
 scikit-learn>=1.3.0
 numpy>=1.24.0
 
+# Dataset ingestion and embeddings
+pydantic>=2.0.0
+jinja2>=3.1.0
+
+# Optional embeddings (install with: pip install fastembed)
+# fastembed>=0.2.0
+
 # Voice (offline-first)
 pyttsx3>=2.90
 
