@@ -1,0 +1,69 @@
+{
+  "datasets": [
+    {
+      "id": "codesearchnet_small",
+      "name": "CodeSearchNet Small Sample",
+      "category": "coding",
+      "description": "Small subset of CodeSearchNet dataset for code understanding",
+      "source_url": "https://github.com/github/CodeSearchNet",
+      "sample_size": 1000,
+      "format": "jsonl",
+      "metadata": {
+        "language": "python",
+        "task": "code_search",
+        "license": "MIT"
+      },
+      "phases": {
+        "download": "pending",
+        "normalize": "pending", 
+        "embed": "pending"
+      },
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "wiki_history_events",
+      "name": "Wikipedia Historical Events",
+      "category": "history",
+      "description": "Curated historical events and timelines from Wikipedia",
+      "source_url": "https://dumps.wikimedia.org/",
+      "sample_size": 500,
+      "format": "jsonl",
+      "metadata": {
+        "language": "en",
+        "task": "historical_qa",
+        "license": "CC-BY-SA"
+      },
+      "phases": {
+        "download": "pending",
+        "normalize": "pending",
+        "embed": "pending"
+      },
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "sec_filings_sample",
+      "name": "SEC Filings Sample",
+      "category": "finance",
+      "description": "Sample SEC filing documents for financial analysis",
+      "source_url": "https://www.sec.gov/edgar",
+      "sample_size": 200,
+      "format": "jsonl",
+      "metadata": {
+        "document_types": ["10-K", "10-Q"],
+        "task": "financial_analysis",
+        "license": "Public Domain"
+      },
+      "phases": {
+        "download": "pending",
+        "normalize": "pending",
+        "embed": "pending"
+      },
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  ],
+  "version": "1.0.0",
+  "last_updated": "2025-01-01T00:00:00Z"
+}

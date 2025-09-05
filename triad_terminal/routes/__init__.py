@@ -1,0 +1,1 @@
+"""Triad Terminal routes module."""

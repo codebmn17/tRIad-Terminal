@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Management - tRIad Terminal</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #00d4aa;
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .header p {
+            color: #888;
+            margin: 5px 0 0 0;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: #00d4aa;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #00b598;
+        }
+        
+        .btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #444;
+            color: #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #555;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        
+        .status-connected { background: #00d4aa; }
+        .status-connecting { background: #ffa500; animation: pulse 2s infinite; }
+        .status-disconnected { background: #ff4444; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .dataset-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .dataset-table th {
+            background: #333;
+            padding: 12px;
+            text-align: left;
+            color: #00d4aa;
+            font-weight: 600;
+        }
+        
+        .dataset-table td {
+            padding: 12px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .dataset-table tr:hover {
+            background: #333;
+        }
+        
+        .dataset-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #3a3a3a;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 4px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        .progress-pending { background: #666; }
+        .progress-running { background: #ffa500; animation: progress-pulse 1.5s infinite; }
+        .progress-completed { background: #00d4aa; }
+        .progress-error { background: #ff4444; }
+        .progress-skipped { background: #888; }
+        
+        @keyframes progress-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .phase-status {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .phase-pending { background: #555; color: #aaa; }
+        .phase-running { background: #ffa500; color: #000; }
+        .phase-completed { background: #00d4aa; color: #000; }
+        .phase-error { background: #ff4444; color: #fff; }
+        .phase-skipped { background: #666; color: #ccc; }
+        
+        .category-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .category-coding { background: #4169e1; color: white; }
+        .category-history { background: #8b4513; color: white; }
+        .category-finance { background: #228b22; color: white; }
+        .category-other { background: #666; color: white; }
+        
+        .search-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+        
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .search-result {
+            padding: 10px;
+            background: #1a1a1a;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 3px solid #00d4aa;
+        }
+        
+        .search-result-score {
+            font-size: 12px;
+            color: #888;
+            float: right;
+        }
+        
+        .search-result-content {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .hidden { display: none; }
+        
+        .log-area {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+        
+        .log-info { color: #00d4aa; }
+        .log-warning { color: #ffa500; }
+        .log-error { color: #ff4444; }
+        .log-success { color: #00d4aa; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dataset Management</h1>
+        <p>Real-time dataset ingestion and embedding system</p>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" id="refresh-btn">Refresh</button>
+        <button class="btn" id="ingest-all-btn">Ingest All</button>
+        <button class="btn btn-secondary" id="clear-logs-btn">Clear Logs</button>
+        <span>Connection: <span id="connection-status">Connecting</span><span class="status-indicator status-connecting" id="status-indicator"></span></span>
+    </div>
+    
+    <div class="search-section" id="search-section" style="display: none;">
+        <h3>Dataset Search</h3>
+        <div class="search-form">
+            <input type="text" class="search-input" id="search-input" placeholder="Enter search query...">
+            <button class="btn" id="search-btn">Search</button>
+        </div>
+        <div id="search-results" class="search-results"></div>
+    </div>
+    
+    <table class="dataset-table">
+        <thead>
+            <tr>
+                <th>Dataset</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="dataset-list">
+            <!-- Datasets will be populated here -->
+        </tbody>
+    </table>
+    
+    <div class="log-area" id="log-area">
+        <div class="log-entry log-info">Dataset management system initialized</div>
+    </div>
+
+    <script src="/static/js/datasets.js"></script>
+</body>
+</html>
