@@ -1,0 +1,17 @@
+# Termux-friendly, pure-Python FastAPI stack (also stable in CI)
+fastapi==0.95.2
+pydantic==1.10.15
+starlette==0.27.0
+uvicorn==0.23.2
+jinja2==3.1.4
+python-dotenv==1.0.1
+
+# Explicit pins for transitive deps to keep things reproducible and Android-safe
+anyio==3.7.1
+sniffio==1.3.1
+h11==0.14.0
+
+# IMPORTANT:
+# - Do NOT install uvicorn[standard] on Termux (pulls watchfiles -> Rust).
+# - Avoid pydantic>=2 on Termux (pulls pydantic-core -> Rust).
+# - For reload during dev, use --reload; uvicorn will fallback to a polling reloader if watchfiles isn't present.
