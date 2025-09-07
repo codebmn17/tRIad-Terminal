@@ -58,7 +58,9 @@ def create_app() -> FastAPI:
     # Mount static files
     with contextlib.suppress(RuntimeError):
         # Static directory doesn't exist, ignore
+copilot/fix-d608ea6d-8f6a-43ba-bcc1-6521e80b4c85
         app.mount("/static", StaticFiles(directory="static"), name="static")
+        pass main
 
     # Add template serving route
     @app.get("/datasets")
@@ -75,15 +77,18 @@ def create_app() -> FastAPI:
 # Create app instance
 app = create_app()
 
+
 # Initialize dataset system on startup
 if DATASETS_AVAILABLE:
 
     @app.on_event("startup")
-    async def startup_event():
+    async def startup_event() -> None:
         """Initialize systems on startup."""
         try:
             from triad_terminal.startup_datasets import initialize_dataset_system
 
-            await initialize_dataset_system()
+            await initialize_dataset_system()copilot/fix-d608ea6d-8f6a-43ba-bcc1-6521e80b4c85
         except Exception as e:
+        except Exception as e:  # noqa: BLE001
+            # Log and continue to avoid crashing the app on optional feature initmain
             print(f"Error initializing dataset system: {e}")
