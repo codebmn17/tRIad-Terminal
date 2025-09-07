@@ -9,15 +9,20 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-
+from fastapi.staticfiles import StaticFiles
+ Termux-compatibility-helpers
 from .routers import health, ml_router, assistant
 from . import ml_status
+=======
+from . import ml_status
+from .routers import assistant, health, ml_router
+ main
 
 # Import dataset routes
 try:
     from triad_terminal.routes.datasets import router as datasets_router
+
     DATASETS_AVAILABLE = True
 except ImportError:
     DATASETS_AVAILABLE = False
@@ -74,15 +79,17 @@ def create_app() -> FastAPI:
 # Create app instance
 app = create_app()
 
+
 # Initialize dataset system on startup
 if DATASETS_AVAILABLE:
 
     @app.on_event("startup")
-    async def startup_event():
+    async def startup_event() -> None:
         """Initialize systems on startup."""
         try:
             from triad_terminal.startup_datasets import initialize_dataset_system
 
             await initialize_dataset_system()
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
+            # Log and continue to avoid crashing the app on optional feature init
             print(f"Error initializing dataset system: {e}")
