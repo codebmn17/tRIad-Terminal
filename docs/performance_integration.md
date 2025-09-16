@@ -34,10 +34,10 @@ from triad_terminal.perf_utils import time_block
 def process_command(cmd):
     with time_block("command_parsing"):
         parsed = parse_command(cmd)
-    
+
     with time_block("command_execution"):
         result = execute_command(parsed)
-    
+
     return result
 ```
 
@@ -92,23 +92,23 @@ Add to the `_process_command` method:
 def _process_command(self, cmd: str) -> None:
     """Process a terminal command"""
     from triad_terminal.perf_runtime import record_command
-    
+
     # Record command for statistics
     record_command(cmd)
-    
+
     cmd_lower = cmd.lower()
-    
+
     if cmd_lower == "perf":
         from triad_terminal.commands.perf import run
         result = run()
         self.ui.print_message(result, "info")
-    
+
     elif cmd_lower == "help":
         # Add timing to existing help
         from triad_terminal.perf_utils import time_block
         with time_block("help_generation"):
             self._show_help()
-    
+
     # ... rest of existing command handling
 ```
 
@@ -183,7 +183,7 @@ os.environ["TRIAD_PERF"] = "1"
 The performance utilities are designed to have minimal dependencies:
 
 - `perf_utils.py`: Only standard library imports
-- `perf_runtime.py`: Only standard library imports  
+- `perf_runtime.py`: Only standard library imports
 - `commands/perf.py`: Only imports from sibling modules
 
 Safe to import from any application module without cycles.
@@ -210,7 +210,7 @@ python your_terminal.py
 # In terminal, test:
 perf
 help
-status  
+status
 perf  # Should show increased command count
 ```
 
@@ -222,7 +222,7 @@ perf  # Should show increased command count
 def load_config(self):
     # existing code
 
-@timed(name="security_init")  
+@timed(name="security_init")
 def init_security(self):
     # existing code
 
@@ -237,13 +237,13 @@ def startup(self):
 ```python
 def execute_command(self, cmd):
     record_command(cmd)
-    
+
     with time_block("command_parse"):
         parsed = self.parse_command(cmd)
-    
+
     with time_block("command_validate"):
         self.validate_command(parsed)
-    
+
     with time_block("command_execute"):
         return self.run_command(parsed)
 ```

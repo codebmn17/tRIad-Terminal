@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <!--
   Triad Terminal Header Component
-  
+
   A reusable header component that can be included in any HTML page
   to provide the standardized Triad Terminal interface.
-  
+
   Usage:
   1. Include this file via iframe, or copy the header element
   2. Ensure the CSS and JS files are loaded:
      <link rel="stylesheet" href="/web/ui/theme/theme-triad.css">
      <script src="/web/ui/theme/init-triad-theme.js"></script>
   3. Add class "triad-theme" to your body element
-  
+
   Customization:
   - Change the title text in .header-center .title
   - Replace /assets/images/anon-mask.svg with your own mask icon
@@ -22,21 +22,21 @@
 <header class="triad-header">
   <!-- Left section: Anonymous mask icon -->
   <div class="header-left">
-    <img src="/assets/images/anon-mask.svg" 
-         alt="Anonymous Mask" 
+    <img src="/assets/images/anon-mask.svg"
+         alt="Anonymous Mask"
          class="mask-icon"
          onerror="this.style.display='none';">
   </div>
-  
+
   <!-- Center section: Terminal title -->
   <div class="header-center">
     <h1 class="title">TRIAD TERMINAL</h1>
   </div>
-  
+
   <!-- Right section: Triangle emblem -->
   <div class="header-right">
-    <img src="/assets/images/triad-triangle.svg" 
-         alt="Triad Triangle" 
+    <img src="/assets/images/triad-triangle.svg"
+         alt="Triad Triangle"
          class="triangle-icon"
          onerror="this.style.opacity='0.3';">
   </div>
@@ -44,7 +44,7 @@
 
 <!--
   Example of full page integration:
-  
+
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -54,13 +54,13 @@
     <link rel="stylesheet" href="/web/ui/theme/theme-triad.css">
   </head>
   <body class="triad-theme" data-triad-auto-header="true">
-    
+
     <!-- Your content here -->
     <main class="triad-panel">
       <h2>Welcome to Triad Terminal</h2>
       <p>This is your cyberpunk-themed terminal interface.</p>
     </main>
-    
+
     <script src="/web/ui/theme/init-triad-theme.js"></script>
   </body>
   </html>

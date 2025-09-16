@@ -17,6 +17,7 @@ __all__ = ["timed", "time_block", "get_perf_logger"]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
+
 def get_perf_logger() -> logging.Logger:
     """
     Get the performance logger with lazy configuration.
@@ -37,9 +38,7 @@ def get_perf_logger() -> logging.Logger:
             logger.setLevel(logging.INFO)
 
             # Create simple formatter for timing logs
-            formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            )
+            formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
             # Add console handler
             handler = logging.StreamHandler()
@@ -73,6 +72,7 @@ def timed(func: F | None = None, *, name: str | None = None) -> F | Callable[[F]
     Returns:
         Decorated function that logs execution time
     """
+
     def decorator(f: F) -> F:
         @functools.wraps(f)
         def wrapper(*args: Any, **kwargs: Any) -> Any:

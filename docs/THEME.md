@@ -22,18 +22,18 @@ The Triad Terminal theme provides:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Triad Terminal App</title>
-  
+
   <!-- Include the theme CSS -->
   <link rel="stylesheet" href="/web/ui/theme/theme-triad.css">
 </head>
 <body class="triad-theme" data-triad-auto-header="true">
-  
+
   <!-- Your content -->
   <main class="triad-panel">
     <h1>Welcome to Triad Terminal</h1>
     <p>Your cyberpunk interface is ready.</p>
   </main>
-  
+
   <!-- Include the theme JavaScript -->
   <script src="/web/ui/theme/init-triad-theme.js"></script>
 </body>
@@ -58,7 +58,7 @@ If you prefer to manually include the header:
       <img src="/assets/images/triad-triangle.svg" alt="Triad Triangle" class="triangle-icon">
     </div>
   </header>
-  
+
   <!-- Your content -->
   <main>
     <!-- ... -->
@@ -124,11 +124,11 @@ app.whenReady().then(() => {
     body.triad-theme {
       -webkit-app-region: no-drag;
     }
-    
+
     .triad-header {
       -webkit-app-region: drag; /* Make header draggable */
     }
-    
+
     .triad-header .mask-icon,
     .triad-header .triangle-icon {
       -webkit-app-region: no-drag; /* Keep icons clickable */
@@ -140,7 +140,7 @@ app.whenReady().then(() => {
     <h2>Electron Triad Terminal</h2>
     <p>Running in desktop mode</p>
   </main>
-  
+
   <script src="web/ui/theme/init-triad-theme.js"></script>
 </body>
 </html>
@@ -205,12 +205,12 @@ if __name__ == '__main__':
   <link rel="stylesheet" href="/web/ui/theme/theme-triad.css">
 </head>
 <body class="triad-theme" data-triad-auto-header="true">
-  
+
   <div class="triad-panel">
     <h2>Flask Triad Terminal</h2>
     <p>Web-based terminal interface</p>
   </div>
-  
+
   <script src="/web/ui/theme/init-triad-theme.js"></script>
 </body>
 </html>
@@ -268,7 +268,7 @@ switchTheme('triad'); // Apply triad theme
 document.addEventListener('DOMContentLoaded', function() {
   if (window.TriadTheme) {
     console.log('Triad theme loaded');
-    
+
     // Manually enhance specific headers
     const customHeader = document.querySelector('#my-header');
     if (customHeader) {
@@ -309,8 +309,8 @@ The theme includes several accessibility features:
 ```html
 <header class="triad-header" role="banner">
   <div class="header-left">
-    <img src="/assets/images/anon-mask.svg" 
-         alt="Anonymous Mask" 
+    <img src="/assets/images/anon-mask.svg"
+         alt="Anonymous Mask"
          class="mask-icon"
          role="img"
          aria-label="Application logo">

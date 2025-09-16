@@ -16,7 +16,7 @@ postgres:
   ports:
     - "5432:5432"
 
-# MongoDB Database  
+# MongoDB Database
 mongodb:
   image: mongo:latest
   environment:
@@ -26,7 +26,7 @@ mongodb:
     - ./data/mongodb:/data/db
   ports:
     - "27017:27017"
-    
+
 # Database Management UI
 adminer:
   image: adminer

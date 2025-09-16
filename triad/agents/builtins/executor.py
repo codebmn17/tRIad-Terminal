@@ -12,13 +12,11 @@ class ExecutorAgent(Agent):
     async def handle(self, msg: Message) -> None:
         # Simple echo for now - can be enhanced later
         if msg.sender != self.name and "execute" in msg.content.lower():
-            await self.send(
-                msg.room,
-                f"Executing: {msg.content[:100]}...",
-                role="assistant"
-            )
+            await self.send(msg.room, f"Executing: {msg.content[:100]}...", role="assistant")
+
+
+from ..core import Agent
 from .utils import safe_md
-from ..core import Agent, Message, Role
 
 SAFE_ACTIONS = {
     "open_url": "Open a URL in the preferred browser",

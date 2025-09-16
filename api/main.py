@@ -78,6 +78,7 @@ app = create_app()
 
 # Initialize dataset system on startup
 if DATASETS_AVAILABLE:
+
     @app.on_event("startup")
     async def startup_event() -> None:
         """Initialize systems on startup."""

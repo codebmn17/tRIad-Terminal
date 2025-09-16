@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
+
 import joblib
 import numpy as np
 from sklearn.datasets import load_iris
@@ -21,10 +22,12 @@ _FEATURE_NAMES = (
     "petal_width",
 )
 
+
 def _ensure_models_dir() -> None:
     models_dir = _ARTIFACT.parent
     if not models_dir.exists():
         models_dir.mkdir(parents=True, exist_ok=True)
+
 
 def _train_and_save() -> KNeighborsClassifier:
     iris = load_iris()
@@ -34,6 +37,7 @@ def _train_and_save() -> KNeighborsClassifier:
     _ensure_models_dir()
     joblib.dump(model, _ARTIFACT)
     return model
+
 
 def _ensure_model() -> KNeighborsClassifier:
     global _MODEL
@@ -45,7 +49,8 @@ def _ensure_model() -> KNeighborsClassifier:
     _MODEL = _train_and_save()
     return _MODEL
 
-def _validate_x(x: List[float]) -> List[float]:
+
+def _validate_x(x: list[float]) -> list[float]:
     # Accept list, tuple, or numpy array
     if isinstance(x, np.ndarray):
         if x.ndim != 1 or x.size != 4:
@@ -58,14 +63,17 @@ def _validate_x(x: List[float]) -> List[float]:
     if not isinstance(x, (list, tuple)):
         raise ValueError("x must be a list or tuple of 4 numeric features")
     if len(x) != 4:
-        raise ValueError("x must have length 4: [sepal_length, sepal_width, petal_length, petal_width]")
+        raise ValueError(
+            "x must have length 4: [sepal_length, sepal_width, petal_length, petal_width]"
+        )
     try:
         xf = [float(v) for v in x]
     except (ValueError, TypeError) as e:
         raise ValueError("x must contain only numeric values") from e
     return xf
 
-def predict(x: List[float]) -> Dict[str, Any]:
+
+def predict(x: list[float]) -> dict[str, Any]:
     """Predict Iris class using the cached KNN model.
 
     Args:
@@ -84,8 +92,8 @@ def predict(x: List[float]) -> Dict[str, Any]:
     pred_idx = int(np.argmax(probs))
     pred_label = _TARGET_NAMES[class_ids[pred_idx]]
 
-    proba_map = {_TARGET_NAMES[c]: float(p) for c, p in zip(class_ids, probs)}
-    features_map = {name: float(val) for name, val in zip(_FEATURE_NAMES, xf)}
+    proba_map = {_TARGET_NAMES[c]: float(p) for c, p in zip(class_ids, probs, strict=False)}
+    features_map = {name: float(val) for name, val in zip(_FEATURE_NAMES, xf, strict=False)}
 
     return {
         "model": "knn",

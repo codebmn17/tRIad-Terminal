@@ -5,7 +5,6 @@ Provides a /perf or :perf command to display performance summary.
 Integrates with the existing command dispatch system.
 """
 
-
 from ..perf_runtime import perf_summary
 
 __all__ = ["run"]

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+
 import joblib
 from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
-
 
 ARTIFACT = Path(__file__).resolve().parents[2] / "models" / "unstoppable_iris_model.pkl"
 
@@ -34,13 +34,15 @@ def main() -> None:
     sample2 = [6.3, 3.3, 6.0, 2.5]  # virginica-like
     pred1 = model.predict([sample1])[0]
     pred2 = model.predict([sample2])[0]
-    print({
-        "model": "forest",
-        "sample1": sample1,
-        "pred1": iris.target_names[pred1],
-        "sample2": sample2,
-        "pred2": iris.target_names[pred2],
-    })
+    print(
+        {
+            "model": "forest",
+            "sample1": sample1,
+            "pred1": iris.target_names[pred1],
+            "sample2": sample2,
+            "pred2": iris.target_names[pred2],
+        }
+    )
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 /**
  * Triad Terminal Theme Initializer
- * 
+ *
  * Automatically applies the Triad theme and ensures proper header setup
  * when the DOM is loaded. This script is safe to include multiple times.
  */
@@ -14,11 +14,11 @@
   function initTriadTheme() {
     // Add the theme class to body
     document.body.classList.add('triad-theme');
-    
+
     // Find and enhance any existing headers
     const headers = document.querySelectorAll('.triad-header');
     headers.forEach(enhanceHeader);
-    
+
     console.log('Triad theme initialized');
   }
 
@@ -34,7 +34,7 @@
 
     // Ensure header has proper structure
     ensureHeaderStructure(header);
-    
+
     // Add triangle icon to the right side
     const headerRight = header.querySelector('.header-right');
     if (headerRight) {
@@ -62,7 +62,7 @@
     if (!headerCenter) {
       headerCenter = document.createElement('div');
       headerCenter.className = 'header-center';
-      
+
       // If there's existing content, move it to center
       const existingTitle = header.querySelector('.title') || header.querySelector('h1');
       if (existingTitle) {
@@ -74,7 +74,7 @@
         title.textContent = 'TRIAD TERMINAL';
         headerCenter.appendChild(title);
       }
-      
+
       header.appendChild(headerCenter);
     }
 
@@ -102,7 +102,7 @@
     img.src = '/assets/images/triad-triangle.svg';
     img.alt = 'Triad Triangle';
     img.className = 'triangle-icon';
-    
+
     // Handle missing image gracefully
     img.onerror = function() {
       console.warn('Triangle icon not found at /assets/images/triad-triangle.svg');
@@ -110,7 +110,7 @@
       this.style.opacity = '0.3';
       this.alt = 'Triangle (missing)';
     };
-    
+
     return img;
   }
 
@@ -123,7 +123,7 @@
     img.src = '/assets/images/anon-mask.svg';
     img.alt = 'Anonymous Mask';
     img.className = 'mask-icon';
-    
+
     // Handle missing image by removing the element
     img.onerror = function() {
       console.info('Mask icon not found at /assets/images/anon-mask.svg - skipping');
@@ -131,7 +131,7 @@
         this.parentNode.removeChild(this);
       }
     };
-    
+
     return img;
   }
 
@@ -141,7 +141,7 @@
   function createDefaultHeader() {
     const header = document.createElement('header');
     header.className = 'triad-header';
-    
+
     // Left section with mask
     const headerLeft = document.createElement('div');
     headerLeft.className = 'header-left';
@@ -149,7 +149,7 @@
     if (maskIcon) {
       headerLeft.appendChild(maskIcon);
     }
-    
+
     // Center section with title
     const headerCenter = document.createElement('div');
     headerCenter.className = 'header-center';
@@ -157,21 +157,21 @@
     title.className = 'title';
     title.textContent = 'TRIAD TERMINAL';
     headerCenter.appendChild(title);
-    
+
     // Right section with triangle
     const headerRight = document.createElement('div');
     headerRight.className = 'header-right';
     const triangleIcon = createTriangleIcon();
     headerRight.appendChild(triangleIcon);
-    
+
     // Assemble header
     header.appendChild(headerLeft);
     header.appendChild(headerCenter);
     header.appendChild(headerRight);
-    
+
     // Insert at top of body
     document.body.insertBefore(header, document.body.firstChild);
-    
+
     return header;
   }
 

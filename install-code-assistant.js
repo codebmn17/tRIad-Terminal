@@ -13,21 +13,21 @@ async function installCodeAssistants() {
     // Get config directory
     const configDir = path.join(process.cwd(), 'config');
     const extensionsDir = path.join(configDir, 'code-server', 'extensions');
-    
+
     if (!fs.existsSync(extensionsDir)) {
       fs.mkdirSync(extensionsDir, { recursive: true });
     }
-    
+
     console.log('Installing code assistance extensions...');
-    
+
     // Create a custom settings file to enable extensions
     const settingsPath = path.join(configDir, 'code-server', 'User', 'settings.json');
     const settingsDir = path.dirname(settingsPath);
-    
+
     if (!fs.existsSync(settingsDir)) {
       fs.mkdirSync(settingsDir, { recursive: true });
     }
-    
+
     // Basic settings for code completion and assistance
     const settings = {
       "editor.snippetSuggestions": "top",
@@ -46,9 +46,9 @@ async function installCodeAssistants() {
       "editor.suggest.showKeywords": true,
       "editor.wordBasedSuggestions": true
     };
-    
+
     fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
-    
+
     console.log('Code assistant settings configured');
     console.log('\nTo enhance your coding experience:');
     console.log('1. Open VS Code in the browser (http://localhost:8080)');
@@ -57,7 +57,7 @@ async function installCodeAssistants() {
     console.log('   - GitHub Copilot (if you have a subscription)');
     console.log('   - Kite (another AI assistant option)');
     console.log('   - IntelliCode');
-    
+
     // Create a helper script to install models
     const modelScript = `#!/bin/bash
 echo "Setting up local machine learning models for code completion..."
@@ -76,17 +76,17 @@ echo "For production use, consider connecting to external API services."
 
     const modelScriptPath = path.join(process.cwd(), 'scripts', 'setup-models.sh');
     const scriptsDir = path.dirname(modelScriptPath);
-    
+
     if (!fs.existsSync(scriptsDir)) {
       fs.mkdirSync(scriptsDir, { recursive: true });
     }
-    
+
     fs.writeFileSync(modelScriptPath, modelScript);
     fs.chmodSync(modelScriptPath, '755');
-    
+
     console.log('\nAdditionally, a script has been created at scripts/setup-models.sh');
     console.log('This is a placeholder for setting up local ML models if desired.');
-    
+
   } catch (error) {
     console.error('Error setting up code assistants:', error);
   }
