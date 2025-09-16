@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict
-
 
 VALID_MODES = {"safe", "anon", "triad"}
 DEFAULT_MODE = "safe"
@@ -10,7 +8,7 @@ DEFAULT_MODE = "safe"
 
 @dataclass
 class ModeState:
-    per_room: Dict[str, str] = field(default_factory=dict)
+    per_room: dict[str, str] = field(default_factory=dict)
 
 
 class ModeManager:
@@ -27,7 +25,7 @@ class ModeManager:
         self._state.per_room[room] = mode
         return mode
 
-    def flags(self, room: str) -> Dict[str, bool]:
+    def flags(self, room: str) -> dict[str, bool]:
         m = self.get_mode(room)
         return {
             "cautious_execution": m == "safe",

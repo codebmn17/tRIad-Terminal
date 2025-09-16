@@ -1,5 +1,7 @@
 import sys
+
 from docx import Document
+
 
 def convert_docx_to_text(path):
     doc = Document(path)

@@ -1,6 +1,7 @@
 from __future__ import annotations
-from .utils import safe_md
+
 from ..core import Agent, Message, Role
+from .utils import safe_md
 
 
 class CriticAgent(Agent):

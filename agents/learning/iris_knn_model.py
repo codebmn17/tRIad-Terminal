@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+
 import joblib
 from sklearn.datasets import load_iris
 from sklearn.neighbors import KNeighborsClassifier
-
 
 ARTIFACT = Path(__file__).resolve().parents[2] / "models" / "iris_knn.joblib"
 

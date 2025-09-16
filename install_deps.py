@@ -1,5 +1,7 @@
 # Double-click this to install required packages (no command line needed).
-import sys, subprocess, os
+import os
+import subprocess
+import sys
 
 PY_CMD = sys.executable
 

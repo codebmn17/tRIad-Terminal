@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import List
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, validator
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field, validator
 
-from models import predict_knn, predict_forest
+from models import predict_forest, predict_knn
 
 app = FastAPI(title="Triad Learning API", version="1.0.0")
 
@@ -18,8 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class FeaturesIn(BaseModel):
-    features: List[float] = Field(..., description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]")
+    features: list[float] = Field(
+        ...,
+        description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]",
+    )
 
     @validator("features")
     def check_len_and_numbers(cls, v):
@@ -31,20 +34,27 @@ class FeaturesIn(BaseModel):
             raise ValueError("features must be numeric") from e
         return v
 
+
 @app.get("/")
 def root():
-    return {"ok": True, "message": "Triad Learning API is running", "endpoints": ["/predict/knn", "/predict/forest"]}
+    return {
+        "ok": True,
+        "message": "Triad Learning API is running",
+        "endpoints": ["/predict/knn", "/predict/forest"],
+    }
+
 
 @app.post("/predict/knn")
 def predict_knn_endpoint(inp: FeaturesIn):
     try:
         return predict_knn(inp.features)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
 
 @app.post("/predict/forest")
 def predict_forest_endpoint(inp: FeaturesIn):
     try:
         return predict_forest(inp.features)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e

@@ -8,14 +8,15 @@ Default behavior: enabled if PERF_ENABLED is unset or set to "1".
 from __future__ import annotations
 
 import os
-import time
 import threading
-from typing import Callable, Any, Dict, List, Optional, TypeVar, cast
+import time
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 
 # Metrics registry: metric name -> list of durations (seconds)
-METRICS: Dict[str, List[float]] = {}
+METRICS: dict[str, list[float]] = {}
 
 # Lock to protect registry mutations
 _METRIC_LOCK = threading.Lock()
@@ -59,12 +60,12 @@ def timed(name: str) -> Callable[[Callable[..., T]], Callable[..., T]]:
                 record(name, duration)
         # Preserve minimal metadata
         inner.__name__ = getattr(func, "__name__", "timed_func")
-        inner.__doc__ = getattr(func, "__doc__")
+        inner.__doc__ = func.__doc__
         return inner
     return wrapper
 
 
-def _percentile(sorted_values: List[float], pct: float) -> Optional[float]:
+def _percentile(sorted_values: list[float], pct: float) -> float | None:
     if not sorted_values:
         return None
     if pct <= 0:
@@ -80,7 +81,7 @@ def _percentile(sorted_values: List[float], pct: float) -> Optional[float]:
     d1 = sorted_values[c] * (k - f)
     return d0 + d1
 
-def snapshot() -> Dict[str, Dict[str, float]]:
+def snapshot() -> dict[str, dict[str, float]]:
     """
     Produce aggregated statistics for each metric:
         count, total, avg, p50, p95
@@ -94,7 +95,7 @@ def snapshot() -> Dict[str, Dict[str, float]]:
         # Copy to avoid holding lock during computation
         items = {k: v[:] for k, v in METRICS.items()}
 
-    report: Dict[str, Dict[str, float]] = {}
+    report: dict[str, dict[str, float]] = {}
     for name, values in items.items():
         if not values:
             continue

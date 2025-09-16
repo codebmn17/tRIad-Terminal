@@ -6,9 +6,9 @@ Provides status information about ML predictor and assistant availability.
 
 from __future__ import annotations
 
-import sys
 import os
-from typing import Dict, Any, Optional
+import sys
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -26,37 +26,37 @@ class MLStatusResponse(BaseModel):
     tensorflow_available: bool
     predictor_ready: bool
     assistant_ready: bool
-    models_loaded: Dict[str, Any]
-    dependency_status: Dict[str, bool]
+    models_loaded: dict[str, Any]
+    dependency_status: dict[str, bool]
 
-def check_dependencies() -> Dict[str, bool]:
+def check_dependencies() -> dict[str, bool]:
     """Check availability of optional ML dependencies."""
     deps = {}
-    
+
     # Check scikit-learn
     try:
         import sklearn
         deps["sklearn"] = True
     except ImportError:
         deps["sklearn"] = False
-    
+
     # Check TensorFlow
     try:
         import tensorflow
         deps["tensorflow"] = True
     except ImportError:
         deps["tensorflow"] = False
-    
+
     # Check joblib
     try:
         import joblib
         deps["joblib"] = True
     except ImportError:
         deps["joblib"] = False
-        
+
     return deps
 
-def check_predictor_status() -> tuple[bool, Dict[str, Any]]:
+def check_predictor_status() -> tuple[bool, dict[str, Any]]:
     """Check ML predictor status and available models."""
     try:
         from ml.predictor import MLPredictor
@@ -74,7 +74,6 @@ def check_predictor_status() -> tuple[bool, Dict[str, Any]]:
 def check_assistant_status() -> bool:
     """Check AI assistant availability."""
     try:
-        from agents.learning.assistant_ml import CodeCompletionEngine
         # Just try to import, don't instantiate to avoid model loading
         return True
     except Exception:
@@ -93,7 +92,7 @@ async def ml_status() -> MLStatusResponse:
     deps = check_dependencies()
     predictor_ready, models_info = check_predictor_status()
     assistant_ready = check_assistant_status()
-    
+
     return MLStatusResponse(
         sklearn_available=deps.get("sklearn", False),
         tensorflow_available=deps.get("tensorflow", False),
@@ -104,7 +103,7 @@ async def ml_status() -> MLStatusResponse:
     )
 
 @router.get("/dependencies")
-async def dependency_check() -> Dict[str, Any]:
+async def dependency_check() -> dict[str, Any]:
     """
     Check status of ML dependencies.
     
@@ -112,7 +111,7 @@ async def dependency_check() -> Dict[str, Any]:
     are available and their versions.
     """
     result = {}
-    
+
     # Check sklearn
     try:
         import sklearn
@@ -125,7 +124,7 @@ async def dependency_check() -> Dict[str, Any]:
             "available": False,
             "error": "scikit-learn not installed"
         }
-    
+
     # Check tensorflow
     try:
         import tensorflow as tf
@@ -138,7 +137,7 @@ async def dependency_check() -> Dict[str, Any]:
             "available": False,
             "note": "Optional heavy dependency - not required for basic functionality"
         }
-    
+
     # Check other dependencies
     for dep_name, module_name in [("joblib", "joblib"), ("numpy", "numpy")]:
         try:
@@ -152,7 +151,7 @@ async def dependency_check() -> Dict[str, Any]:
                 "available": False,
                 "error": f"{dep_name} not available"
             }
-    
+
     return {
         "dependencies": result,
         "summary": {

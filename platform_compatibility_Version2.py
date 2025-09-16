@@ -6,31 +6,31 @@ Ensures consistent behavior across different operating systems
 """
 
 import os
-import sys
-import shutil
 import platform
+import shutil
 import subprocess
-from typing import Optional, Dict, Any, List
+import sys
+
 
 class PlatformInfo:
     """Information about the current platform"""
-    
+
     @staticmethod
     def is_windows() -> bool:
         return os.name == 'nt' or platform.system() == 'Windows'
-    
+
     @staticmethod
     def is_macos() -> bool:
         return platform.system() == 'Darwin'
-    
+
     @staticmethod
     def is_linux() -> bool:
         return platform.system() == 'Linux' and not PlatformInfo.is_termux()
-    
+
     @staticmethod
     def is_termux() -> bool:
         return os.path.exists('/data/data/com.termux')
-    
+
     @staticmethod
     def get_platform_name() -> str:
         if PlatformInfo.is_termux():
@@ -43,67 +43,67 @@ class PlatformInfo:
             return 'linux'
         else:
             return 'unknown'
-    
+
     @staticmethod
     def get_home_directory() -> str:
         """Get user's home directory"""
         return os.path.expanduser('~')
-    
+
     @staticmethod
     def get_config_directory() -> str:
         """Get platform-specific config directory"""
         home = PlatformInfo.get_home_directory()
-        
+
         if PlatformInfo.is_windows():
             # Windows: %APPDATA%\TriadTerminal
             appdata = os.getenv('APPDATA')
             if appdata:
                 return os.path.join(appdata, 'TriadTerminal')
             return os.path.join(home, 'AppData', 'Roaming', 'TriadTerminal')
-        
+
         elif PlatformInfo.is_macos():
             # macOS: ~/Library/Application Support/TriadTerminal
             return os.path.join(home, 'Library', 'Application Support', 'TriadTerminal')
-        
+
         else:
             # Linux/Termux: ~/.config/triad
             return os.path.join(home, '.config', 'triad')
-    
+
     @staticmethod
     def get_data_directory() -> str:
         """Get platform-specific data directory"""
         home = PlatformInfo.get_home_directory()
-        
+
         if PlatformInfo.is_windows():
             # Windows: %LOCALAPPDATA%\TriadTerminal
             localdata = os.getenv('LOCALAPPDATA')
             if localdata:
                 return os.path.join(localdata, 'TriadTerminal')
             return os.path.join(home, 'AppData', 'Local', 'TriadTerminal')
-        
+
         elif PlatformInfo.is_macos():
             # macOS: ~/Library/Application Support/TriadTerminal
             return os.path.join(home, 'Library', 'Application Support', 'TriadTerminal')
-        
+
         else:
             # Linux/Termux: ~/.local/share/triad
             return os.path.join(home, '.local', 'share', 'triad')
-    
+
     @staticmethod
     def get_temp_directory() -> str:
         """Get a temporary directory"""
         import tempfile
         return tempfile.gettempdir()
-    
+
     @staticmethod
-    def get_terminal_size() -> Dict[str, int]:
+    def get_terminal_size() -> dict[str, int]:
         """Get terminal dimensions"""
         try:
             columns, lines = shutil.get_terminal_size()
             return {'columns': columns, 'lines': lines}
         except Exception:
             return {'columns': 80, 'lines': 24}  # Fallback values
-    
+
     @staticmethod
     def supports_ansi_colors() -> bool:
         """Check if terminal supports ANSI colors"""
@@ -111,7 +111,7 @@ class PlatformInfo:
             # Windows Terminal, ConEmu, and modern PowerShell support ANSI
             if os.environ.get('WT_SESSION') or os.environ.get('ConEmuANSI') == 'ON':
                 return True
-                
+
             # Check Windows version - Windows 10 1607 and later support ANSI
             try:
                 version = sys.getwindowsversion()
@@ -119,15 +119,15 @@ class PlatformInfo:
                     return True
             except:
                 pass
-                
+
             return False
-        
+
         # Most Unix-like terminals support ANSI colors
         return True
 
 class SystemCommands:
     """Platform-specific system commands"""
-    
+
     @staticmethod
     def clear_screen() -> None:
         """Clear the terminal screen"""
@@ -135,7 +135,7 @@ class SystemCommands:
             os.system('cls')
         else:
             os.system('clear')
-    
+
     @staticmethod
     def open_file(path: str) -> bool:
         """Open a file with default application"""
@@ -149,7 +149,7 @@ class SystemCommands:
             return True
         except Exception:
             return False
-    
+
     @staticmethod
     def open_url(url: str) -> bool:
         """Open URL in default browser"""
@@ -159,9 +159,9 @@ class SystemCommands:
             return True
         except Exception:
             return False
-    
+
     @staticmethod
-    def run_command(cmd: List[str], shell: bool = False) -> Optional[str]:
+    def run_command(cmd: list[str], shell: bool = False) -> str | None:
         """Run system command and return output"""
         try:
             result = subprocess.run(
@@ -182,7 +182,7 @@ class SystemCommands:
 
 class Dependencies:
     """Handle platform-specific dependencies"""
-    
+
     @staticmethod
     def check_dependency(name: str) -> bool:
         """Check if a dependency is installed"""
@@ -194,13 +194,13 @@ class Dependencies:
             return True
         except Exception:
             return False
-    
+
     @staticmethod
     def get_install_command(dependency: str) -> str:
         """Get platform-specific install command for a dependency"""
         if PlatformInfo.is_termux():
             return f"pkg install {dependency}"
-        
+
         elif PlatformInfo.is_windows():
             # Try to suggest appropriate Windows package manager
             if Dependencies.check_dependency('choco'):
@@ -209,13 +209,13 @@ class Dependencies:
                 return f"scoop install {dependency}"
             else:
                 return f"Please install {dependency} manually"
-        
+
         elif PlatformInfo.is_macos():
             if Dependencies.check_dependency('brew'):
                 return f"brew install {dependency}"
             else:
                 return f"Please install Homebrew first, then run: brew install {dependency}"
-        
+
         else:  # Linux
             if Dependencies.check_dependency('apt'):
                 return f"sudo apt install {dependency}"
@@ -225,7 +225,7 @@ class Dependencies:
                 return f"sudo pacman -S {dependency}"
             else:
                 return f"Please install {dependency} using your package manager"
-    
+
     @staticmethod
     def install_python_package(package: str) -> bool:
         """Install a Python package"""
@@ -237,7 +237,7 @@ class Dependencies:
 
 class ShellIntegration:
     """Handle shell integration"""
-    
+
     @staticmethod
     def get_shell_type() -> str:
         """Detect current shell type"""
@@ -254,13 +254,13 @@ class ShellIntegration:
             return 'cmd'
         else:
             return 'sh'
-    
+
     @staticmethod
-    def get_shell_config_file() -> Optional[str]:
+    def get_shell_config_file() -> str | None:
         """Get path to shell configuration file"""
         home = PlatformInfo.get_home_directory()
         shell_type = ShellIntegration.get_shell_type()
-        
+
         if shell_type == 'zsh':
             return os.path.join(home, '.zshrc')
         elif shell_type == 'bash':
@@ -284,39 +284,39 @@ class ShellIntegration:
             except Exception:
                 return None
         return None
-    
+
     @staticmethod
     def add_to_path(directory: str) -> bool:
         """Add directory to PATH in shell config"""
         config_file = ShellIntegration.get_shell_config_file()
         if not config_file:
             return False
-            
+
         shell_type = ShellIntegration.get_shell_type()
-        
+
         try:
             # Read existing config
             if os.path.exists(config_file):
-                with open(config_file, 'r') as f:
+                with open(config_file) as f:
                     content = f.read()
             else:
                 content = ""
-            
+
             # Check if already in config
             if directory in content:
                 return True
-            
+
             # Add to PATH based on shell type
             with open(config_file, 'a') as f:
                 f.write('\n# Added by Triad Terminal\n')
-                
+
                 if shell_type == 'powershell':
                     f.write(f'$env:PATH = "$env:PATH;{directory}"\n')
                 elif shell_type == 'fish':
                     f.write(f'set -gx PATH {directory} $PATH\n')
                 else:  # bash, zsh, sh
                     f.write(f'export PATH="{directory}:$PATH"\n')
-                
+
             return True
         except Exception:
             return False

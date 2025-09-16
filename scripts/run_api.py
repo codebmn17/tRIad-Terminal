@@ -5,9 +5,10 @@ Run the production-ready tRIad Terminal API.
 This script starts the FastAPI application using Uvicorn with production settings.
 """
 
-import uvicorn
 import os
 import sys
+
+import uvicorn
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,7 +22,7 @@ def main():
     print("🔄 Interactive docs at: http://127.0.0.1:8000/redoc")
     print("\n💡 Press Ctrl+C to stop the server")
     print("-" * 50)
-    
+
     try:
         uvicorn.run(
             "api.main:app",

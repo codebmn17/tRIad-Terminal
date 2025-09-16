@@ -6,13 +6,12 @@ Provides ML model prediction capabilities.
 
 from __future__ import annotations
 
-from typing import List, Dict, Any, Optional
+import os
+import sys
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, validator
-
-import sys
-import os
 
 # Add project root to path for imports
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,8 +27,8 @@ predictor = MLPredictor()
 
 class PredictionRequest(BaseModel):
     """Request model for ML predictions."""
-    features: List[float] = Field(..., description="Input features for prediction")
-    model_type: Optional[str] = Field("auto", description="Model type to use (auto, knn, forest)")
+    features: list[float] = Field(..., description="Input features for prediction")
+    model_type: str | None = Field("auto", description="Model type to use (auto, knn, forest)")
 
     @validator("features")
     def validate_features(cls, v):
@@ -46,7 +45,7 @@ class PredictionResponse(BaseModel):
     """Response model for ML predictions."""
     prediction: Any
     model_used: str
-    confidence: Optional[float] = None
+    confidence: float | None = None
     processing_time_ms: float
 
 @router.post("/predict", response_model=PredictionResponse)
@@ -65,12 +64,12 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
         return PredictionResponse(**result)
     except Exception as e:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail=f"Prediction failed: {str(e)}"
         ) from e
 
 @router.get("/models")
-async def list_models() -> Dict[str, Any]:
+async def list_models() -> dict[str, Any]:
     """
     List available ML models.
     
