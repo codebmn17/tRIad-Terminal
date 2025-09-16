@@ -7,13 +7,12 @@ natural language processing, code completion, and training.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import time
-from typing import Dict, Any, List
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
 
 # Add project root to path for imports
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,10 +20,20 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from api.schemas import (
-    AssistantStatus, PredictCommandRequest, PredictCommandResponse,
-    NLRequest, NLResponse, CodeCompletionRequest, CodeCompletionResponse,
-    FeedbackRequest, FeedbackResponse, TrainRequest, TrainResponse,
-    MLStatusResponse, SchemaResponse, get_assistant_schema
+    AssistantStatus,
+    CodeCompletionRequest,
+    CodeCompletionResponse,
+    FeedbackRequest,
+    FeedbackResponse,
+    MLStatusResponse,
+    NLRequest,
+    NLResponse,
+    PredictCommandRequest,
+    PredictCommandResponse,
+    SchemaResponse,
+    TrainRequest,
+    TrainResponse,
+    get_assistant_schema,
 )
 
 # Import the AI assistant
@@ -36,7 +45,7 @@ except ImportError:
         # Fallback to the current file name
         import importlib.util
         spec = importlib.util.spec_from_file_location(
-            "assistant_ml", 
+            "assistant_ml",
             os.path.join(project_root, "agents", "learning", "assistant-ML.py")
         )
         assistant_ml = importlib.util.module_from_spec(spec)
@@ -53,15 +62,15 @@ router = APIRouter()
 # Initialize the AI assistant
 _assistant_instance = None
 
-def get_assistant() -> 'AIAssistant':
+def get_assistant() -> AIAssistant:
     """Get or create the AI assistant instance."""
     global _assistant_instance
     if not ASSISTANT_AVAILABLE:
         raise HTTPException(status_code=503, detail="AI Assistant not available")
-    
+
     if _assistant_instance is None:
         _assistant_instance = AIAssistant()
-    
+
     return _assistant_instance
 
 
@@ -76,9 +85,9 @@ async def get_assistant_status() -> AssistantStatus:
     try:
         assistant = get_assistant()
         status_data = assistant.status()
-        
+
         return AssistantStatus(**status_data)
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -95,27 +104,27 @@ async def predict_command(request: PredictCommandRequest) -> PredictCommandRespo
     """
     try:
         assistant = get_assistant()
-        
+
         suggestions = assistant.predict_command(
             prefix=request.prefix
         )
-        
+
         # Set context if provided
         if request.context:
             assistant.set_context(request.context)
-            
+
         # Get context-aware suggestions
         context_suggestions = assistant.predict_command(
             prefix=request.prefix
         )[:request.max_suggestions]
-        
+
         return PredictCommandResponse(
             success=True,
             suggestions=context_suggestions,
             context_used=request.context,
             confidence_scores=None  # Could be enhanced later
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -132,9 +141,9 @@ async def process_natural_language(request: NLRequest) -> NLResponse:
     """
     try:
         assistant = get_assistant()
-        
+
         result = assistant.process_nl_command(request.nl_command)
-        
+
         return NLResponse(
             success=result.get("success", False),
             intent=result.get("intent"),
@@ -142,7 +151,7 @@ async def process_natural_language(request: NLRequest) -> NLResponse:
             command=result.get("command"),
             confidence=result.get("confidence", 0.0)
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -159,21 +168,21 @@ async def complete_code(request: CodeCompletionRequest) -> CodeCompletionRespons
     """
     try:
         assistant = get_assistant()
-        
+
         suggestions = assistant.complete_code(
             code_context=request.code_context,
             language=request.language
         )
-        
+
         # Limit suggestions to requested amount
         limited_suggestions = suggestions[:request.max_suggestions]
-        
+
         return CodeCompletionResponse(
             success=len(limited_suggestions) > 0,
             suggestions=limited_suggestions,
             language=request.language
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -190,25 +199,25 @@ async def provide_feedback(request: FeedbackRequest) -> FeedbackResponse:
     """
     try:
         assistant = get_assistant()
-        
+
         # Provide feedback to the assistant
         assistant.provide_feedback(
             nl_command=request.nl_command,
             executed_command=request.executed_command,
             intent=request.intent
         )
-        
+
         # Try to guess intent if not provided
         intent_guessed = None
         if not request.intent:
             intent_guessed = assistant._guess_intent(request.executed_command)
-        
+
         return FeedbackResponse(
             success=True,
             message="Feedback processed successfully",
             intent_guessed=intent_guessed
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -225,12 +234,12 @@ async def train_assistant(request: TrainRequest) -> TrainResponse:
     """
     try:
         assistant = get_assistant()
-        
+
         result = assistant.train_models(
             force=request.force,
             components=request.components or ["all"]
         )
-        
+
         return TrainResponse(
             success=result["success"],
             message=result["message"],
@@ -239,7 +248,7 @@ async def train_assistant(request: TrainRequest) -> TrainResponse:
             after_stats=result["after_stats"],
             training_time_ms=result["training_time_ms"]
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -256,19 +265,18 @@ async def get_ml_status() -> MLStatusResponse:
     """
     try:
         # Import constants to check ML availability
-        from agents.learning import assistant_ml  # This should work after our import handling
-        
+
         assistant = get_assistant()
         status_data = assistant.status()
-        
+
         return MLStatusResponse(
             sklearn_available=status_data["ml_availability"]["sklearn"],
             tensorflow_available=status_data["ml_availability"]["tensorflow"],
             models_initialized=status_data["model_details"],
             training_data_size=status_data["component_stats"]
         )
-        
-    except Exception as e:
+
+    except Exception:
         # Fallback status
         return MLStatusResponse(
             sklearn_available=False,
@@ -287,7 +295,7 @@ async def get_schemas() -> SchemaResponse:
     """
     try:
         schema_data = get_assistant_schema()
-        
+
         # Create schema info metadata
         schema_info = [
             {
@@ -296,7 +304,7 @@ async def get_schemas() -> SchemaResponse:
                 "version": "1.0.0"
             },
             {
-                "schema_name": "PredictCommandResponse", 
+                "schema_name": "PredictCommandResponse",
                 "description": "Response format for command predictions",
                 "version": "1.0.0"
             },
@@ -316,13 +324,13 @@ async def get_schemas() -> SchemaResponse:
                 "version": "1.0.0"
             }
         ]
-        
+
         return SchemaResponse(
             schemas=schema_data["assistant_schemas"],
             schema_info=schema_info,
             api_version="1.0.0"
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -332,7 +340,7 @@ async def get_schemas() -> SchemaResponse:
 
 # Health check endpoint specifically for assistant
 @router.get("/health")
-async def assistant_health() -> Dict[str, Any]:
+async def assistant_health() -> dict[str, Any]:
     """
     Health check for the assistant service.
     
@@ -341,7 +349,7 @@ async def assistant_health() -> Dict[str, Any]:
     try:
         assistant = get_assistant()
         status_data = assistant.status()
-        
+
         return {
             "status": "healthy" if status_data["enabled"] else "unavailable",
             "assistant_available": ASSISTANT_AVAILABLE,
@@ -349,7 +357,7 @@ async def assistant_health() -> Dict[str, Any]:
             "training_ready": status_data["training_ready"],
             "timestamp": time.time()
         }
-        
+
     except Exception as e:
         return {
             "status": "error",

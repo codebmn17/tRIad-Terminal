@@ -7,9 +7,9 @@ code completion, and natural language processing.
 
 from __future__ import annotations
 
-import sys
 import os
-from typing import Dict, Any, List, Optional
+import sys
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -26,32 +26,32 @@ class AssistantStatusResponse(BaseModel):
     available: bool
     sklearn_available: bool
     models_trained: bool
-    supported_languages: List[str]
-    features: Dict[str, bool]
+    supported_languages: list[str]
+    features: dict[str, bool]
 
 class CommandPredictionRequest(BaseModel):
     """Request model for command prediction."""
     context: str = Field(..., description="Current command context or partial command")
-    history: Optional[List[str]] = Field(default=[], description="Recent command history")
-    max_suggestions: Optional[int] = Field(default=5, description="Maximum number of suggestions")
+    history: list[str] | None = Field(default=[], description="Recent command history")
+    max_suggestions: int | None = Field(default=5, description="Maximum number of suggestions")
 
 class CommandPredictionResponse(BaseModel):
     """Response model for command prediction."""
-    suggestions: List[str]
-    confidence_scores: Optional[List[float]] = None
+    suggestions: list[str]
+    confidence_scores: list[float] | None = None
     source: str  # "ml" or "heuristic"
 
 class CodeCompletionRequest(BaseModel):
     """Request model for code completion."""
     code: str = Field(..., description="Current code context")
     language: str = Field(..., description="Programming language")
-    position: Optional[int] = Field(default=None, description="Cursor position in code")
-    max_completions: Optional[int] = Field(default=5, description="Maximum number of completions")
+    position: int | None = Field(default=None, description="Cursor position in code")
+    max_completions: int | None = Field(default=5, description="Maximum number of completions")
 
 class CodeCompletionResponse(BaseModel):
     """Response model for code completion."""
-    completions: List[str]
-    confidence_scores: Optional[List[float]] = None
+    completions: list[str]
+    confidence_scores: list[float] | None = None
     source: str  # "ml" or "heuristic"
 
 class NaturalLanguageRequest(BaseModel):
@@ -62,15 +62,15 @@ class NaturalLanguageRequest(BaseModel):
 class NaturalLanguageResponse(BaseModel):
     """Response model for natural language processing."""
     result: str
-    confidence: Optional[float] = None
-    metadata: Optional[Dict[str, Any]] = None
+    confidence: float | None = None
+    metadata: dict[str, Any] | None = None
 
 class FeedbackRequest(BaseModel):
     """Request model for assistant feedback."""
-    prediction_id: Optional[str] = Field(default=None, description="ID of prediction to provide feedback on")
+    prediction_id: str | None = Field(default=None, description="ID of prediction to provide feedback on")
     feedback_type: str = Field(..., description="Type of feedback: positive, negative, or correction")
-    suggestion: Optional[str] = Field(default=None, description="User's preferred suggestion")
-    context: Optional[str] = Field(default=None, description="Additional context")
+    suggestion: str | None = Field(default=None, description="User's preferred suggestion")
+    context: str | None = Field(default=None, description="Additional context")
 
 def get_assistant_engine():
     """Get assistant engine instance with error handling."""
@@ -83,7 +83,7 @@ def get_assistant_engine():
             detail=f"Assistant not available: {str(e)}"
         ) from e
 
-def heuristic_command_prediction(context: str, history: List[str]) -> List[str]:
+def heuristic_command_prediction(context: str, history: list[str]) -> list[str]:
     """Fallback heuristic command prediction."""
     # Basic heuristic suggestions based on common commands
     common_commands = [
@@ -91,20 +91,20 @@ def heuristic_command_prediction(context: str, history: List[str]) -> List[str]:
         "git status", "git add", "git commit", "git push", "git pull",
         "python", "pip install", "npm install", "docker run", "make"
     ]
-    
+
     if not context:
         return common_commands[:5]
-    
+
     # Simple prefix matching
     matches = [cmd for cmd in common_commands if cmd.startswith(context.lower())]
-    
+
     # If no prefix matches, try substring matching
     if not matches:
         matches = [cmd for cmd in common_commands if context.lower() in cmd]
-    
+
     return matches[:5]
 
-def heuristic_code_completion(code: str, language: str) -> List[str]:
+def heuristic_code_completion(code: str, language: str) -> list[str]:
     """Fallback heuristic code completion."""
     common_completions = {
         "python": [
@@ -117,16 +117,16 @@ def heuristic_code_completion(code: str, language: str) -> List[str]:
             "echo ", "cd ", "ls ", "mkdir ", "rm ", "cp ", "mv ", "grep ", "find "
         ]
     }
-    
+
     lang_completions = common_completions.get(language.lower(), common_completions["python"])
-    
+
     if not code:
         return lang_completions[:5]
-    
+
     # Simple context-aware completion
     last_word = code.split()[-1] if code.split() else ""
     matches = [comp for comp in lang_completions if comp.startswith(last_word)]
-    
+
     return matches[:5] if matches else lang_completions[:5]
 
 @router.get("/status", response_model=AssistantStatusResponse)
@@ -145,7 +145,7 @@ async def assistant_status() -> AssistantStatusResponse:
             sklearn_available = True
         except ImportError:
             pass
-        
+
         # Try to get assistant engine
         try:
             engine = get_assistant_engine()
@@ -153,11 +153,11 @@ async def assistant_status() -> AssistantStatusResponse:
             # Check if models are trained (simplified check)
             models_trained = len(getattr(engine, 'language_models', {})) > 0
             supported_languages = getattr(engine, 'supported_languages', ['python', 'javascript', 'bash'])
-        except:
+        except Exception:
             available = False
             models_trained = False
             supported_languages = ['python', 'javascript', 'bash']  # Default fallback
-        
+
         return AssistantStatusResponse(
             available=available,
             sklearn_available=sklearn_available,
@@ -170,7 +170,7 @@ async def assistant_status() -> AssistantStatusResponse:
                 "machine_learning": sklearn_available and available
             }
         )
-    except Exception as e:
+    except Exception:
         # Return degraded status instead of failing
         return AssistantStatusResponse(
             available=False,
@@ -256,7 +256,7 @@ async def process_natural_language(request: NaturalLanguageRequest) -> NaturalLa
                 "move file": "mv",
                 "show current directory": "pwd"
             }
-            
+
             text_lower = request.text.lower()
             for phrase, command in command_mapping.items():
                 if phrase in text_lower:
@@ -265,13 +265,13 @@ async def process_natural_language(request: NaturalLanguageRequest) -> NaturalLa
                         confidence=0.8,
                         metadata={"task": "command_translation", "matched_phrase": phrase}
                     )
-            
+
             return NaturalLanguageResponse(
                 result="Sorry, I couldn't translate that to a command",
                 confidence=0.0,
                 metadata={"task": "command_translation", "error": "no_match"}
             )
-        
+
         elif request.task == "intent":
             # Simple intent recognition
             if any(word in request.text.lower() for word in ["help", "how", "what", "?"]):
@@ -282,20 +282,20 @@ async def process_natural_language(request: NaturalLanguageRequest) -> NaturalLa
                 intent = "deletion_request"
             else:
                 intent = "unknown"
-            
+
             return NaturalLanguageResponse(
                 result=intent,
                 confidence=0.7,
                 metadata={"task": "intent_recognition"}
             )
-        
+
         else:
             return NaturalLanguageResponse(
                 result=f"Task '{request.task}' not supported. Available tasks: intent, command",
                 confidence=0.0,
                 metadata={"task": request.task, "error": "unsupported_task"}
             )
-            
+
     except Exception as e:
         return NaturalLanguageResponse(
             result=f"Error processing text: {str(e)}",
@@ -304,7 +304,7 @@ async def process_natural_language(request: NaturalLanguageRequest) -> NaturalLa
         )
 
 @router.post("/feedback")
-async def provide_feedback(request: FeedbackRequest) -> Dict[str, str]:
+async def provide_feedback(request: FeedbackRequest) -> dict[str, str]:
     """
     Provide feedback on assistant suggestions.
     

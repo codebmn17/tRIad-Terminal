@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
+
 from api.routers import perf as perf_router
 
 app = FastAPI(title="Storm OS API")

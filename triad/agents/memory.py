@@ -1,26 +1,25 @@
 from __future__ import annotations
 
-import dataclasses as _dc
 import datetime as _dt
 import json as _json
 import os as _os
 from collections import deque
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Deque, Dict, Iterable, Iterator, List, Optional
 
 from .core import Message
 
 
 def _now_iso() -> str:
-    return _dt.datetime.now(_dt.timezone.utc).isoformat()
+    return _dt.datetime.now(_dt.UTC).isoformat()
 
 
 @dataclass
 class RoomMemory:
     name: str
     maxlen: int
-    buffer: Deque[Message]
+    buffer: deque[Message]
     file: Path
 
 
@@ -37,9 +36,9 @@ class MemoryStore:
         self.rooms_dir = self.root / "rooms"
         self.core_path = self.root / "core_memory.json"
         self.maxlen = int(maxlen)
-        self._rooms: Dict[str, RoomMemory] = {}
+        self._rooms: dict[str, RoomMemory] = {}
         self._ensure_dirs()
-        self._core_cache: Dict[str, List[Dict[str, str]]] = self._load_core()
+        self._core_cache: dict[str, list[dict[str, str]]] = self._load_core()
 
     # setup
     def _ensure_dirs(self) -> None:
@@ -52,7 +51,7 @@ class MemoryStore:
     def _get_room(self, room: str) -> RoomMemory:
         if room not in self._rooms:
             f = self._room_file(room)
-            buf: Deque[Message] = deque(maxlen=self.maxlen)
+            buf: deque[Message] = deque(maxlen=self.maxlen)
             # warm buffer from tail of file (optional, best‑effort)
             if f.exists():
                 try:
@@ -93,7 +92,7 @@ class MemoryStore:
         return " \n".join(parts)
 
     # core memory (long‑term topics)
-    def _load_core(self) -> Dict[str, List[Dict[str, str]]]:
+    def _load_core(self) -> dict[str, list[dict[str, str]]]:
         if not self.core_path.exists():
             return {}
         try:
@@ -102,7 +101,7 @@ class MemoryStore:
         except Exception:
             return {}
 
-    def _atomic_write_core(self, data: Dict[str, List[Dict[str, str]]]) -> None:
+    def _atomic_write_core(self, data: dict[str, list[dict[str, str]]]) -> None:
         tmp = self.core_path.with_suffix(".tmp")
         with tmp.open("w", encoding="utf-8") as fh:
             _json.dump(data, fh, ensure_ascii=False, indent=2)
@@ -116,10 +115,10 @@ class MemoryStore:
         bucket.append({"ts": _now_iso(), "text": text.strip()})
         self._atomic_write_core(self._core_cache)
 
-    def core_get(self, topic: str) -> List[Dict[str, str]]:
+    def core_get(self, topic: str) -> list[dict[str, str]]:
         return list(self._core_cache.get(topic, []))
 
-    def core_list(self) -> List[str]:
+    def core_list(self) -> list[str]:
         return sorted(self._core_cache.keys())
 
     def core_del(self, topic: str) -> bool:

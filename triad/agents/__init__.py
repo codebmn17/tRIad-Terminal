@@ -1,4 +1,4 @@
 
 # Triad Agents
-from .core import Message, Agent, Role
+from .core import Agent, Message, Role
 from .rooms import Room, Router

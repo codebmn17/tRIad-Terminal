@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import List
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, validator
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field, validator
 
-from models import predict_knn, predict_forest
+from models import predict_forest, predict_knn
 
 app = FastAPI(title="Triad Learning API", version="1.0.0")
 
@@ -19,7 +18,7 @@ app.add_middleware(
 )
 
 class FeaturesIn(BaseModel):
-    features: List[float] = Field(..., description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]")
+    features: list[float] = Field(..., description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]")
 
     @validator("features")
     def check_len_and_numbers(cls, v):

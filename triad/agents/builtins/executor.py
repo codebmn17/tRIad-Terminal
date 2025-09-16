@@ -17,8 +17,8 @@ class ExecutorAgent(Agent):
                 f"Executing: {msg.content[:100]}...",
                 role="assistant"
             )
+from ..core import Agent
 from .utils import safe_md
-from ..core import Agent, Message, Role
 
 SAFE_ACTIONS = {
     "open_url": "Open a URL in the preferred browser",

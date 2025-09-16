@@ -7,8 +7,8 @@ with a focus on assistant functionality.
 
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, Literal, Union
 from datetime import datetime
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -19,23 +19,23 @@ class AssistantStatus(BaseModel):
     models_loaded: bool = Field(..., description="Whether ML models are loaded")
     training_ready: bool = Field(..., description="Whether the assistant is ready for training")
     intent_mapping_size: int = Field(..., description="Number of intent mappings available")
-    last_trained: Optional[datetime] = Field(None, description="Last training timestamp")
-    capabilities: List[str] = Field(..., description="List of assistant capabilities")
+    last_trained: datetime | None = Field(None, description="Last training timestamp")
+    capabilities: list[str] = Field(..., description="List of assistant capabilities")
 
 
 class PredictCommandRequest(BaseModel):
     """Request model for command prediction."""
     prefix: str = Field("", description="Command prefix to complete")
-    context: Optional[str] = Field(None, description="Current context (e.g., directory)")
+    context: str | None = Field(None, description="Current context (e.g., directory)")
     max_suggestions: int = Field(5, ge=1, le=20, description="Maximum number of suggestions")
 
 
 class PredictCommandResponse(BaseModel):
     """Response model for command prediction."""
     success: bool = Field(..., description="Whether prediction was successful")
-    suggestions: List[str] = Field(..., description="List of command suggestions")
-    context_used: Optional[str] = Field(None, description="Context that was used for prediction")
-    confidence_scores: Optional[List[float]] = Field(None, description="Confidence scores for suggestions")
+    suggestions: list[str] = Field(..., description="List of command suggestions")
+    context_used: str | None = Field(None, description="Context that was used for prediction")
+    confidence_scores: list[float] | None = Field(None, description="Confidence scores for suggestions")
 
 
 class NLRequest(BaseModel):
@@ -46,9 +46,9 @@ class NLRequest(BaseModel):
 class NLResponse(BaseModel):
     """Response model for natural language processing."""
     success: bool = Field(..., description="Whether NL processing was successful")
-    intent: Optional[str] = Field(None, description="Detected intent")
-    entities: Dict[str, str] = Field(default_factory=dict, description="Extracted entities")
-    command: Optional[str] = Field(None, description="Generated shell command")
+    intent: str | None = Field(None, description="Detected intent")
+    entities: dict[str, str] = Field(default_factory=dict, description="Extracted entities")
+    command: str | None = Field(None, description="Generated shell command")
     confidence: float = Field(0.0, description="Confidence score for the result")
 
 
@@ -62,7 +62,7 @@ class CodeCompletionRequest(BaseModel):
 class CodeCompletionResponse(BaseModel):
     """Response model for code completion."""
     success: bool = Field(..., description="Whether completion was successful")
-    suggestions: List[str] = Field(..., description="List of code completion suggestions")
+    suggestions: list[str] = Field(..., description="List of code completion suggestions")
     language: str = Field(..., description="Programming language used")
 
 
@@ -70,7 +70,7 @@ class FeedbackRequest(BaseModel):
     """Request model for providing feedback to the assistant."""
     nl_command: str = Field(..., description="Original natural language command")
     executed_command: str = Field(..., description="Command that was executed")
-    intent: Optional[str] = Field(None, description="Intent (will be guessed if not provided)")
+    intent: str | None = Field(None, description="Intent (will be guessed if not provided)")
     success: bool = Field(True, description="Whether the command execution was successful")
 
 
@@ -78,13 +78,13 @@ class FeedbackResponse(BaseModel):
     """Response model for feedback submission."""
     success: bool = Field(..., description="Whether feedback was processed successfully")
     message: str = Field(..., description="Result message")
-    intent_guessed: Optional[str] = Field(None, description="Intent that was guessed for the command")
+    intent_guessed: str | None = Field(None, description="Intent that was guessed for the command")
 
 
 class TrainRequest(BaseModel):
     """Request model for training the assistant."""
     force: bool = Field(False, description="Force retraining even if recent training exists")
-    components: Optional[List[Literal["code", "commands", "nl", "all"]]] = Field(
+    components: list[Literal["code", "commands", "nl", "all"]] | None = Field(
         ["all"], description="Which components to train"
     )
 
@@ -93,9 +93,9 @@ class TrainResponse(BaseModel):
     """Response model for training results."""
     success: bool = Field(..., description="Whether training was successful")
     message: str = Field(..., description="Training result message")
-    components_trained: List[str] = Field(..., description="List of components that were trained")
-    before_stats: Dict[str, Any] = Field(..., description="Model statistics before training")
-    after_stats: Dict[str, Any] = Field(..., description="Model statistics after training")
+    components_trained: list[str] = Field(..., description="List of components that were trained")
+    before_stats: dict[str, Any] = Field(..., description="Model statistics before training")
+    after_stats: dict[str, Any] = Field(..., description="Model statistics after training")
     training_time_ms: float = Field(..., description="Training time in milliseconds")
 
 
@@ -103,8 +103,8 @@ class MLStatusResponse(BaseModel):
     """Response model for ML status information."""
     sklearn_available: bool = Field(..., description="Whether scikit-learn is available")
     tensorflow_available: bool = Field(..., description="Whether TensorFlow is available")
-    models_initialized: Dict[str, bool] = Field(..., description="Status of model initialization")
-    training_data_size: Dict[str, int] = Field(..., description="Size of training datasets")
+    models_initialized: dict[str, bool] = Field(..., description="Status of model initialization")
+    training_data_size: dict[str, int] = Field(..., description="Size of training datasets")
 
 
 class SchemaInfo(BaseModel):
@@ -116,12 +116,12 @@ class SchemaInfo(BaseModel):
 
 class SchemaResponse(BaseModel):
     """Response model for schema information."""
-    schemas: Dict[str, Dict[str, Any]] = Field(..., description="Available JSON schemas")
-    schema_info: List[SchemaInfo] = Field(..., description="Metadata about schemas")
+    schemas: dict[str, dict[str, Any]] = Field(..., description="Available JSON schemas")
+    schema_info: list[SchemaInfo] = Field(..., description="Metadata about schemas")
     api_version: str = Field("1.0.0", description="API version")
 
 
-def get_assistant_schema() -> Dict[str, Any]:
+def get_assistant_schema() -> dict[str, Any]:
     """
     Return JSON Schema fragments for assistant-related models.
     
@@ -129,18 +129,18 @@ def get_assistant_schema() -> Dict[str, Any]:
         Dict containing JSON schema definitions for all assistant models.
     """
     schemas = {}
-    
+
     # Get schemas for all the response models
     model_classes = [
         AssistantStatus, PredictCommandResponse, CodeCompletionResponse,
         NLResponse, FeedbackResponse, TrainResponse, MLStatusResponse,
         SchemaResponse
     ]
-    
+
     for model_class in model_classes:
         schema = model_class.model_json_schema()
         schemas[model_class.__name__] = schema
-    
+
     return {
         "assistant_schemas": schemas,
         "version": "1.0.0",
@@ -153,7 +153,7 @@ __all__ = [
     "AssistantStatus",
     "PredictCommandRequest", "PredictCommandResponse",
     "NLRequest", "NLResponse",
-    "CodeCompletionRequest", "CodeCompletionResponse", 
+    "CodeCompletionRequest", "CodeCompletionResponse",
     "FeedbackRequest", "FeedbackResponse",
     "TrainRequest", "TrainResponse",
     "MLStatusResponse", "SchemaResponse",

@@ -2,16 +2,14 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import os
 import sys
-from typing import List, Type
 
-from .core import Agent, Message, Role
-from .rooms import Router
-from .registry import discover_builtin_agents
-from .memory import MemoryStore
-from .modes import ModeManager, VALID_MODES, DEFAULT_MODE
 from .builtins.recorder import RecorderAgent
+from .core import Agent, Message, Role
+from .memory import MemoryStore
+from .modes import DEFAULT_MODE, VALID_MODES, ModeManager
+from .registry import discover_builtin_agents
+from .rooms import Router
 
 ANSI = {
     "reset": "\x1b[0m",
@@ -41,40 +39,40 @@ def format_line(room: str, sender: str, role: str, text: str) -> str:
 
 class MessageDisplayAgent(Agent):
     """Special agent to display messages from other agents"""
-    
+
     def __init__(self):
         super().__init__("_display", role=Role(name="display", icon=""))
-    
+
     async def handle(self, msg: Message) -> None:
         if msg.sender == self.name or msg.sender == "you":
             return
-        
+
         # Get the role icon
         icon = ""
         if hasattr(msg, 'meta') and 'icon' in msg.meta:
             icon = msg.meta['icon']
-        
+
         # Format and display the message
         role_prefix = f"{icon} {msg.role}" if icon else msg.role
         sender_info = f"[{color('cyan', role_prefix)}] {color('green', msg.sender)}"
         print(f"{sender_info}: {msg.content}")
 
 
-async def run_chat(agent_classes: List[Type[Agent]], room: str = "main") -> None:
+async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None:
     router = Router()
     store = MemoryStore()
     modes = ModeManager()
     modes.set_mode(room, DEFAULT_MODE)
 
     # Instantiate agents
-    agents: List[Agent] = [cls() for cls in agent_classes]
+    agents: list[Agent] = [cls() for cls in agent_classes]
     recorder = RecorderAgent(store)
     agents.insert(0, recorder)
-    
+
     # Add display agent to show responses
     display_agent = MessageDisplayAgent()
     agents.append(display_agent)
-    
+
     for a in agents:
         a.attach(router)
         await a.join(room)
@@ -207,15 +205,15 @@ def main() -> int:
     args = parser.parse_args()
 
     builtins = discover_builtin_agents()
-    
+
     missing = [a for a in args.agents if a not in builtins]
     if missing:
         print("Unknown agents:", ", ".join(missing))
         print("Available:", ", ".join(sorted(builtins.keys())))
         return 2
 
-    classes: List[Type[Agent]] = [builtins[name] for name in args.agents]
-    
+    classes: list[type[Agent]] = [builtins[name] for name in args.agents]
+
     asyncio.run(run_chat(classes, room=args.room))
     return 0
 

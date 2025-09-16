@@ -7,7 +7,7 @@ Provides system health and status information.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -36,7 +36,7 @@ async def health_check() -> HealthResponse:
     )
 
 @router.get("/")
-async def root() -> Dict[str, Any]:
+async def root() -> dict[str, Any]:
     """
     Root endpoint with basic API information.
     
