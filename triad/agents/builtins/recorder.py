@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+
 from ..core import Agent, Message, Role
 from ..memory import MemoryStore
 
@@ -13,8 +15,5 @@ class RecorderAgent(Agent):
 
     async def handle(self, msg: Message) -> None:
         # Record without responding
-        try:
+        with contextlib.suppress(Exception):
             self._store.record(msg)
-        except Exception:
-            # Never crash the bus due to recording issues
-            pass
