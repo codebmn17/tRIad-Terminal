@@ -5,6 +5,7 @@ Triad Terminal Shell Interface
 Provides enhanced shell integration capabilities
 """
 
+import contextlib
 import os
 import sys
 import re
@@ -757,10 +758,8 @@ class InteractiveShell:
         
         # Kill any running process
         if self.current_process:
-            try:
+            with contextlib.suppress(Exception):
                 self.current_process.terminate()
-            except Exception:
-                pass
 
 class PseudoTerminal:
     """Pseudo-terminal for running interactive programs"""
@@ -848,10 +847,8 @@ class PseudoTerminal:
     def _cleanup(self) -> None:
         """Clean up resources"""
         if self.fd:
-            try:
+            with contextlib.suppress(OSError):
                 os.close(self.fd)
-            except OSError:
-                pass
             self.fd = None
             
         self.running = False

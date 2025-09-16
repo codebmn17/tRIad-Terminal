@@ -59,7 +59,7 @@ def _validate_x(x: List[float]) -> List[float]:
     try:
         floats = [float(v) for v in x]
     except Exception as e:
-        raise ValueError(f"x must be numeric: {e}")
+        raise ValueError(f"x must be numeric: {e}") from e
     return floats
 
 def predict(x: List[float]) -> Dict[str, Any]:

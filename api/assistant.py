@@ -81,7 +81,7 @@ def get_assistant_engine():
         raise HTTPException(
             status_code=503,
             detail=f"Assistant not available: {str(e)}"
-        )
+        ) from e
 
 def heuristic_command_prediction(context: str, history: List[str]) -> List[str]:
     """Fallback heuristic command prediction."""
@@ -323,4 +323,4 @@ async def provide_feedback(request: FeedbackRequest) -> Dict[str, str]:
         raise HTTPException(
             status_code=500,
             detail=f"Error processing feedback: {str(e)}"
-        )
+        ) from e

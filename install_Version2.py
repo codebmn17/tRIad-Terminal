@@ -323,10 +323,9 @@ def main():
     print(f"\nInstalling Triad Terminal to: {install_path}")
     
     # Check dependencies
-    if not args.skip_dependencies:
-        if not check_dependencies():
-            print("\n❌ Failed to install required dependencies. Installation aborted.")
-            return 1
+    if not args.skip_dependencies and not check_dependencies():
+        print("\n❌ Failed to install required dependencies. Installation aborted.")
+        return 1
     
     # Copy files
     if not copy_files(install_path):

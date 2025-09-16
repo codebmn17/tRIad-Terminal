@@ -112,7 +112,7 @@ class DeploymentManager:
             try:
                 with open(self.history_file, 'r') as f:
                     history = json.load(f)
-            except:
+            except Exception:
                 history = []
         
         # Add new entry
@@ -177,7 +177,7 @@ class DeploymentExecutor:
                         stderr=asyncio.subprocess.PIPE
                     )
                     await npm_process.communicate()
-            except:
+            except Exception:
                 result['error'] = "Vercel CLI not installed and could not be installed"
                 return result
             
@@ -259,7 +259,7 @@ class DeploymentExecutor:
                         stderr=asyncio.subprocess.PIPE
                     )
                     await npm_process.communicate()
-            except:
+            except Exception:
                 result['error'] = "Netlify CLI not installed and could not be installed"
                 return result
             
@@ -358,7 +358,7 @@ class DeploymentExecutor:
                 if process.returncode != 0:
                     result['error'] = "AWS CLI not installed"
                     return result
-            except:
+            except Exception:
                 result['error'] = "AWS CLI not installed"
                 return result
             

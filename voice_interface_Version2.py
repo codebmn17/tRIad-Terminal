@@ -7,6 +7,7 @@ Provides text-to-speech and speech recognition capabilities
 
 from __future__ import annotations
 
+import contextlib
 import os
 import json
 import time
@@ -141,10 +142,8 @@ class VoiceManager:
                         playsound.playsound(temp_file, True)
                         
                         # Clean up
-                        try:
+                        with contextlib.suppress(Exception):
                             os.remove(temp_file)
-                        except Exception:
-                            pass
                     except Exception as e:
                         logger.error(f"TTS (gTTS) error: {e}")
                 

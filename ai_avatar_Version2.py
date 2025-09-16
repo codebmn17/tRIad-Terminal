@@ -5,6 +5,7 @@ Triad Terminal AI Avatar
 Displays a visual representation of the AI assistant
 """
 
+import contextlib
 import os
 import sys
 import json
@@ -228,10 +229,8 @@ class AIAvatar:
             # Remove custom avatar file if it exists
             custom_avatar_file = os.path.join(self.data_dir, "custom_avatar.json")
             if os.path.exists(custom_avatar_file):
-                try:
+                with contextlib.suppress(Exception):
                     os.remove(custom_avatar_file)
-                except Exception:
-                    pass
                     
             logger.info(f"Reset to default avatar style: {style}")
         else:
@@ -317,7 +316,7 @@ class AIAvatar:
             if HAS_RICH:
                 console = Console()
                 
-                for i, char in enumerate(text):
+                for i, _char in enumerate(text):
                     if self.stop_event.is_set():
                         break
                         
@@ -368,7 +367,7 @@ class AIAvatar:
                 ))
             else:
                 # Simple animation without rich
-                for i, char in enumerate(text):
+                for i, _char in enumerate(text):
                     if self.stop_event.is_set():
                         break
                         
