@@ -57,19 +57,19 @@ def format_line(room: str, sender: str, role: str, text: str) -> str:
 
 class MessageDisplayAgent(Agent):
     """Special agent to display messages from other agents"""
-    
+
     def __init__(self):
         super().__init__("_display", role=Role(name="display", icon=""))
-    
+
     async def handle(self, msg: Message) -> None:
         if msg.sender == self.name or msg.sender == "you":
             return
-        
+
         # Get the role icon
         icon = ""
         if hasattr(msg, 'meta') and 'icon' in msg.meta:
             icon = msg.meta['icon']
-        
+
         # Format and display the message
         role_prefix = f"{icon} {msg.role}" if icon else msg.role
         sender_info = f"[{color('cyan', role_prefix)}] {color('green', msg.sender)}"
@@ -81,11 +81,11 @@ async def run_chat(agent_classes: List[Type[Agent]], room: str = "main") -> None
 
     # Instantiate agents
     agents: List[Agent] = [cls() for cls in agent_classes]
-    
+
     # Add display agent to show responses
     display_agent = MessageDisplayAgent()
     agents.append(display_agent)
-    
+
     for a in agents:
         a.attach(router)
         await a.join(room)
@@ -216,13 +216,13 @@ async def run_chat(agent_classes: List[Type[Agent]], room: str = "main") -> None
             user_text = user_text.strip("\n")
             if not user_text:
                 continue
-            
+
             print(f"{color('yellow', '[you]')}: {user_text}")
             await router.post(Message(room=room, sender="you", content=user_text, role="user"))
-            
+
             # Small delay to let agents respond
             await asyncio.sleep(0.1)
-            
+
     except KeyboardInterrupt:
         print("\nbye")
     finally:

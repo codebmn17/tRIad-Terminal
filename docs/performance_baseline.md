@@ -34,7 +34,7 @@ Measure cold startup time of different terminal variants:
 ```bash
 # Measure main terminal startup
 time python triad-terminal.py --help
-time python secure_terminal_Version2.py --help  
+time python secure_terminal_Version2.py --help
 time python integrated_terminal_Version2.py --help
 
 # Measure with different flags
@@ -92,7 +92,7 @@ export TRIAD_PERF=1
 
 # Start terminal and run commands, observe timing logs:
 help
-status  
+status
 clear
 /perf
 exit
@@ -179,7 +179,7 @@ import sys
 
 modules = [
     "triad_terminal",
-    "triad_terminal.perf_utils", 
+    "triad_terminal.perf_utils",
     "triad_terminal.perf_runtime",
     "triad_terminal.commands.perf"
 ]
@@ -206,6 +206,6 @@ After gathering baseline measurements:
 ## Notes
 
 - Run measurements multiple times and average for accuracy
-- Measure on the same system/environment for consistency  
+- Measure on the same system/environment for consistency
 - Consider both cold start and warm start scenarios
 - Document any significant environmental factors

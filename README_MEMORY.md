@@ -125,20 +125,20 @@ async def example():
     router = Router()
     store = MemoryStore()
     recorder = RecorderAgent(store)
-    
+
     # Start recorder
     recorder.attach(router)
     await recorder.join("example_room")
     await recorder.start()
-    
+
     # Send a message
     msg = Message(room="example_room", sender="user", content="Hello world!")
     await router.post(msg)
-    
+
     # Check recorded messages
     messages = list(store.iter("example_room"))
     print(f"Recorded {len(messages)} messages")
-    
+
     # Clean up
     await recorder.stop()
 
@@ -153,7 +153,7 @@ from triad.agents.core import Agent, Message, Role
 class MyAgent(Agent):
     def __init__(self):
         super().__init__("my_agent", role=Role(name="helper", icon="🤖"))
-    
+
     async def handle(self, msg: Message) -> None:
         if msg.sender != self.name and "help" in msg.content.lower():
             await self.send(msg.room, "I'm here to help!", role="assistant")

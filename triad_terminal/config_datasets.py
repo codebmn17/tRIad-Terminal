@@ -1,8 +1,6 @@
 """Dataset configuration settings."""
 
 import os
-from typing import List
-
 
 # Environment variables for dataset configuration
 AUTO_DOWNLOAD_DATASETS = os.environ.get("AUTO_DOWNLOAD_DATASETS", "0") == "1"
@@ -12,11 +10,7 @@ EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "sentence-transformers/all-M
 MAX_EMBED_CHUNK_TOKENS = int(os.environ.get("MAX_EMBED_CHUNK_TOKENS", "512"))
 
 # Initial datasets to auto-download
-INITIAL_DATASETS: List[str] = [
-    "codesearchnet_small",
-    "wiki_history_events", 
-    "sec_filings_sample"
-]
+INITIAL_DATASETS: list[str] = ["codesearchnet_small", "wiki_history_events", "sec_filings_sample"]
 
 # Override from environment if set
 if os.environ.get("INITIAL_DATASETS"):

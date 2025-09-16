@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import glob
 import os
-import sys
 
 try:
     import cairosvg  # type: ignore

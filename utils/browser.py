@@ -12,12 +12,12 @@ from typing import Optional
 def open_url(url: str, new: int = 2, autoraise: bool = True) -> bool:
     """
     Open a URL in the default browser.
-    
+
     Args:
         url: The URL to open
         new: 0=same window, 1=new window, 2=new tab
         autoraise: Whether to raise the browser window
-        
+
     Returns:
         True if successful, False otherwise
     """
@@ -25,11 +25,11 @@ def open_url(url: str, new: int = 2, autoraise: bool = True) -> bool:
         # Basic validation
         if not url or not isinstance(url, str):
             return False
-            
+
         # Ensure URL has a scheme
         if not url.startswith(('http://', 'https://', 'file://')):
             url = 'https://' + url
-            
+
         return webbrowser.open(url, new=new, autoraise=autoraise)
     except Exception:
         return False

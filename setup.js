@@ -22,23 +22,23 @@ async function setup() {
     const homeDir = process.env.HOME || process.env.USERPROFILE;
     const installPath = await askQuestion(`Installation directory [${path.join(homeDir, 'devpod')}]: `);
     const basePath = installPath || path.join(homeDir, 'devpod');
-    
+
     console.log(`\nSetting up DevPod in ${basePath}...`);
-    
+
     if (!fs.existsSync(basePath)) {
       fs.mkdirSync(basePath, { recursive: true });
     }
-    
+
     // Create subdirectories
     ['workspace', 'config', 'gitea', 'jupyter', '.devcontainer'].forEach(dir => {
       if (!fs.existsSync(path.join(basePath, dir))) {
         fs.mkdirSync(path.join(basePath, dir), { recursive: true });
       }
     });
-    
+
     // Generate password
     const password = await askQuestion('Set password for code-server: ');
-    
+
     // Write docker-compose file
     const composeFile = path.join(basePath, 'docker-compose.yml');
     const composeContent = `version: '3'
@@ -54,7 +54,7 @@ services:
     environment:
       - PASSWORD=${password}
       - DOCKER_HOST=tcp://docker-socket-proxy:2375
-    
+
   gitea:
     image: gitea/gitea:latest
     restart: unless-stopped
@@ -65,14 +65,14 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
-  
+
   jupyter:
     image: jupyter/datascience-notebook:latest
     ports:
       - "8888:8888"
     volumes:
       - ./jupyter:/home/jovyan/work
-    
+
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy
     restart: unless-stopped
@@ -87,14 +87,14 @@ services:
 `;
 
     fs.writeFileSync(composeFile, composeContent);
-    
+
     // Copy dashboard HTML
     fs.writeFileSync(path.join(basePath, 'dashboard.html'), fs.readFileSync(path.join(__dirname, 'index.html')));
-    
+
     console.log('\nConfiguration complete!');
-    
+
     const startNow = (await askQuestion('Start DevPod now? [y/n]: ')).toLowerCase();
-    
+
     if (startNow === 'y' || startNow === 'yes') {
       console.log('\nStarting DevPod...');
       process.chdir(basePath);
@@ -108,7 +108,7 @@ services:
       console.log('\nTo start DevPod later, run:');
       console.log(`cd ${basePath} && docker-compose up -d`);
     }
-    
+
     console.log('\nThank you for using DevPod!');
   } catch (error) {
     console.error('Setup failed:', error);
