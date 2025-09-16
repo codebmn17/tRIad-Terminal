@@ -163,3 +163,13 @@ class SecureTerminal:
             commands.extend([
                 {"name": "users", "description": "User management"},
                 {"name
+                 commands.extend([
+    {
+        "name": "users",
+        "description": "User management",
+    },
+    {
+        "name": "sessions",
+        "description": "Session handling",
+    }
+])
