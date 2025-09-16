@@ -545,7 +545,11 @@ def plugins_create(plugin_name):
         f.write("""import click
 
 class Plugin:
+    class Plugin:
     """A Triad Terminal plugin"""
+
+    def __init__(self):
+        pass
     
     def __init__(self):
         self.name = "PLUGIN_NAME"
