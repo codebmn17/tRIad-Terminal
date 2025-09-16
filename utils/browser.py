@@ -42,9 +42,6 @@ def get_default_browser() -> Optional[str]:
         return browser.name if hasattr(browser, 'name') else str(type(browser).__name__)
     except Exception:
         return None
-=======
-import webbrowser
-import sys
 
 def open_url(url):
     try:

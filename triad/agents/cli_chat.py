@@ -2,15 +2,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import sys
-from typing import List, Type
-
-from .core import Agent, Message
-from .rooms import Router
-from .registry import discover_builtin_agents
-from .memory import MemoryStore
-from .modes import ModeManager, VALID_MODES, DEFAULT_MODE
-from .builtins.recorder import RecorderAgent
 import os
 import sys
 from typing import List, Type
@@ -18,6 +9,9 @@ from typing import List, Type
 from .core import Agent, Message, Role
 from .rooms import Router
 from .registry import discover_builtin_agents
+from .memory import MemoryStore
+from .modes import ModeManager, VALID_MODES, DEFAULT_MODE
+from .builtins.recorder import RecorderAgent
 
 ANSI = {
     "reset": "\x1b[0m",
@@ -39,16 +33,6 @@ def banner(room: str, mode: str) -> None:
     print(color("dim", "Type your message. Use /help for commands. Ctrl+C to exit."))
 
 
-async def run_chat(agent_classes: List[Type[Agent]], *, room: str = "main", data_dir: str = ".triad", mem_max: int = 10_000) -> None:
-    router = Router()
-    store = MemoryStore(data_dir=data_dir, maxlen=mem_max)
-    modes = ModeManager()
-    modes.set_mode(room, DEFAULT_MODE)
-
-    # Instantiate agents
-    agents: List[Agent] = [cls() for cls in agent_classes]
-    recorder = RecorderAgent(store)
-    agents.insert(0, recorder)
 
 def format_line(room: str, sender: str, role: str, text: str) -> str:
     head = f"[{room}] {sender}:{' ' if sender else ''}"
@@ -78,9 +62,14 @@ class MessageDisplayAgent(Agent):
 
 async def run_chat(agent_classes: List[Type[Agent]], room: str = "main") -> None:
     router = Router()
+    store = MemoryStore()
+    modes = ModeManager()
+    modes.set_mode(room, DEFAULT_MODE)
 
     # Instantiate agents
     agents: List[Agent] = [cls() for cls in agent_classes]
+    recorder = RecorderAgent(store)
+    agents.insert(0, recorder)
     
     # Add display agent to show responses
     display_agent = MessageDisplayAgent()
@@ -203,26 +192,6 @@ async def run_chat(agent_classes: List[Type[Agent]], room: str = "main") -> None
             meta = {"mode": modes.get_mode(current_room)}
             await router.post(Message(room=current_room, sender="you", content=line, role="user", meta=meta))
 
-    print(color("bold", f"Triad multi‑agent chat — room '{room}'"))
-    print(color("dim", "Type your message. Ctrl+C to exit."))
-    print()
-
-    try:
-        loop = asyncio.get_event_loop()
-        while True:
-            user_text = await loop.run_in_executor(None, sys.stdin.readline)
-            if not user_text:
-                break
-            user_text = user_text.strip("\n")
-            if not user_text:
-                continue
-            
-            print(f"{color('yellow', '[you]')}: {user_text}")
-            await router.post(Message(room=room, sender="you", content=user_text, role="user"))
-            
-            # Small delay to let agents respond
-            await asyncio.sleep(0.1)
-            
     except KeyboardInterrupt:
         print("\nbye")
     finally:
@@ -238,10 +207,7 @@ def main() -> int:
     args = parser.parse_args()
 
     builtins = discover_builtin_agents()
-    # Ensure recorder is always present regardless of specified agents
-    args = parser.parse_args()
-
-    builtins = discover_builtin_agents()
+    
     missing = [a for a in args.agents if a not in builtins]
     if missing:
         print("Unknown agents:", ", ".join(missing))
@@ -249,9 +215,7 @@ def main() -> int:
         return 2
 
     classes: List[Type[Agent]] = [builtins[name] for name in args.agents]
-
-    asyncio.run(run_chat(classes, room=args.room, data_dir=args.data_dir, mem_max=args.mem_max))
-    classes = [builtins[name] for name in args.agents]
+    
     asyncio.run(run_chat(classes, room=args.room))
     return 0
 
