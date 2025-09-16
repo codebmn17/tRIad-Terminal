@@ -203,7 +203,7 @@ async def run_chat(agent_classes: List[Type[Agent]], room: str = "main") -> None
             meta = {"mode": modes.get_mode(current_room)}
             await router.post(Message(room=current_room, sender="you", content=line, role="user", meta=meta))
 
-    print(color("bold", f"Triad multi‑agent chat — room '{room}'"))
+    print(color("bold", f"Triad multi-agent chat - room {room}"))
     print(color("dim", "Type your message. Ctrl+C to exit."))
     print()
 
