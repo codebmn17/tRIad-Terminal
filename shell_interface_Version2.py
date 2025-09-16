@@ -22,6 +22,7 @@ from typing import Any
 
 logger = logging.getLogger("triad.shell")
 
+
 class ShellEnvironment:
     """Manages shell environment variables and configuration"""
 
@@ -44,15 +45,15 @@ class ShellEnvironment:
         self.aliases = self._load_aliases()
 
         # Path management
-        self.original_path = os.environ.get('PATH', '')
+        self.original_path = os.environ.get("PATH", "")
 
         # Shell preferences
         self.preferences = {
-            'prompt': '\\[\033[01;32m\\]\\u@triad\\[\033[00m\\]:\\[\033[01;34m\\]\\w\\[\033[00m\\]\\$ ',
-            'editor': os.environ.get('EDITOR', 'nano'),
-            'use_color': True,
-            'history_size': 1000,
-            'auto_completion': True
+            "prompt": "\\[\033[01;32m\\]\\u@triad\\[\033[00m\\]:\\[\033[01;34m\\]\\w\\[\033[00m\\]\\$ ",
+            "editor": os.environ.get("EDITOR", "nano"),
+            "use_color": True,
+            "history_size": 1000,
+            "auto_completion": True,
         }
 
     def _load_history(self) -> list[str]:
@@ -72,11 +73,11 @@ class ShellEnvironment:
         """Save command history"""
         try:
             # Limit history size
-            max_size = self.preferences.get('history_size', 1000)
+            max_size = self.preferences.get("history_size", 1000)
             history = self.history[-max_size:] if len(self.history) > max_size else self.history
 
-            with open(self.history_file, 'w') as f:
-                f.write('\n'.join(history))
+            with open(self.history_file, "w") as f:
+                f.write("\n".join(history))
         except Exception as e:
             logger.error(f"Error saving history: {e}")
 
@@ -98,8 +99,8 @@ class ShellEnvironment:
                 with open(self.aliases_file) as f:
                     for line in f:
                         line = line.strip()
-                        if line and not line.startswith('#'):
-                            parts = line.split('=', 1)
+                        if line and not line.startswith("#"):
+                            parts = line.split("=", 1)
                             if len(parts) == 2:
                                 name, value = parts
                                 aliases[name.strip()] = value.strip()
@@ -111,7 +112,7 @@ class ShellEnvironment:
     def save_aliases(self) -> None:
         """Save shell aliases"""
         try:
-            with open(self.aliases_file, 'w') as f:
+            with open(self.aliases_file, "w") as f:
                 for name, value in self.aliases.items():
                     f.write(f"{name}={value}\n")
         except Exception as e:
@@ -171,19 +172,19 @@ class ShellEnvironment:
         if not os.path.exists(directory):
             return
 
-        path = self.current_env.get('PATH', '')
+        path = self.current_env.get("PATH", "")
         paths = path.split(os.pathsep)
 
         if directory not in paths:
             paths.insert(0, directory)
             new_path = os.pathsep.join(paths)
 
-            self.current_env['PATH'] = new_path
-            os.environ['PATH'] = new_path
+            self.current_env["PATH"] = new_path
+            os.environ["PATH"] = new_path
 
     def get_path(self) -> list[str]:
         """Get current PATH as a list"""
-        path = self.current_env.get('PATH', '')
+        path = self.current_env.get("PATH", "")
         return path.split(os.pathsep)
 
     def get_env(self) -> dict[str, str]:
@@ -202,7 +203,7 @@ class ShellEnvironment:
             expanded = self.aliases[parts[0]]
             if len(parts) > 1:
                 # Add the remaining arguments
-                expanded += ' ' + ' '.join(parts[1:])
+                expanded += " " + " ".join(parts[1:])
             return expanded
 
         return command
@@ -218,15 +219,16 @@ class ShellEnvironment:
 
     def get_formatted_prompt(self) -> str:
         """Get formatted shell prompt"""
-        prompt = self.preferences.get('prompt', '> ')
+        prompt = self.preferences.get("prompt", "> ")
 
         # Process special sequences
-        prompt = prompt.replace('\\u', os.environ.get('USER', 'user'))
-        prompt = prompt.replace('\\h', os.uname().nodename.split('.')[0])
-        prompt = prompt.replace('\\w', os.getcwd().replace(os.path.expanduser('~'), '~'))
-        prompt = prompt.replace('\\W', os.path.basename(os.getcwd()))
+        prompt = prompt.replace("\\u", os.environ.get("USER", "user"))
+        prompt = prompt.replace("\\h", os.uname().nodename.split(".")[0])
+        prompt = prompt.replace("\\w", os.getcwd().replace(os.path.expanduser("~"), "~"))
+        prompt = prompt.replace("\\W", os.path.basename(os.getcwd()))
 
         return prompt
+
 
 class InteractiveShell:
     """Interactive shell with advanced features"""
@@ -253,23 +255,24 @@ class InteractiveShell:
     def _setup_command_handlers(self) -> dict[str, Callable]:
         """Set up internal command handlers"""
         return {
-            'cd': self._handle_cd,
-            'exit': self._handle_exit,
-            'alias': self._handle_alias,
-            'unalias': self._handle_unalias,
-            'export': self._handle_export,
-            'unset': self._handle_unset,
-            'history': self._handle_history,
-            'path': self._handle_path,
-            'pwd': self._handle_pwd,
-            'clear': self._handle_clear,
-            'echo': self._handle_echo
+            "cd": self._handle_cd,
+            "exit": self._handle_exit,
+            "alias": self._handle_alias,
+            "unalias": self._handle_unalias,
+            "export": self._handle_export,
+            "unset": self._handle_unset,
+            "history": self._handle_history,
+            "path": self._handle_path,
+            "pwd": self._handle_pwd,
+            "clear": self._handle_clear,
+            "echo": self._handle_echo,
         }
 
     def _get_terminal_size(self) -> tuple[int, int]:
         """Get terminal dimensions"""
         try:
             import shutil
+
             return shutil.get_terminal_size((80, 24))
         except (ImportError, OSError):
             return 24, 80
@@ -280,15 +283,15 @@ class InteractiveShell:
 
     def _handle_cd(self, args: list[str]) -> int:
         """Handle cd command"""
-        target_dir = args[0] if args else '~'
+        target_dir = args[0] if args else "~"
 
         # Expand home directory
-        if target_dir == '~' or target_dir.startswith('~/'):
+        if target_dir == "~" or target_dir.startswith("~/"):
             target_dir = os.path.expanduser(target_dir)
 
         # Handle - (previous directory)
-        if target_dir == '-':
-            target_dir = os.environ.get('OLDPWD', '')
+        if target_dir == "-":
+            target_dir = os.environ.get("OLDPWD", "")
             if not target_dir:
                 print("OLDPWD not set")
                 return 1
@@ -296,15 +299,15 @@ class InteractiveShell:
         try:
             # Save old directory
             old_cwd = os.getcwd()
-            os.environ['OLDPWD'] = old_cwd
+            os.environ["OLDPWD"] = old_cwd
 
             # Change directory
             os.chdir(target_dir)
             self.cwd = os.getcwd()
 
             # Update PWD environment variable
-            os.environ['PWD'] = self.cwd
-            self.env.set_env_var('PWD', self.cwd)
+            os.environ["PWD"] = self.cwd
+            self.env.set_env_var("PWD", self.cwd)
 
             return 0
         except FileNotFoundError:
@@ -335,8 +338,8 @@ class InteractiveShell:
             return 0
 
         # Add/update alias
-        if '=' in args[0]:
-            name, value = args[0].split('=', 1)
+        if "=" in args[0]:
+            name, value = args[0].split("=", 1)
             self.env.add_alias(name, value)
             return 0
 
@@ -354,7 +357,7 @@ class InteractiveShell:
             print("unalias: not enough arguments")
             return 1
 
-        if args[0] == '-a':
+        if args[0] == "-a":
             # Remove all aliases
             self.env.aliases.clear()
             self.env.save_aliases()
@@ -377,9 +380,9 @@ class InteractiveShell:
             return 0
 
         for arg in args:
-            if '=' in arg:
+            if "=" in arg:
                 # Set variable
-                name, value = arg.split('=', 1)
+                name, value = arg.split("=", 1)
                 self.env.set_env_var(name, value)
             else:
                 print(f"export: {arg}: invalid variable name")
@@ -400,7 +403,7 @@ class InteractiveShell:
 
     def _handle_history(self, args: list[str]) -> int:
         """Handle history command"""
-        if args and args[0] == '-c':
+        if args and args[0] == "-c":
             # Clear history
             self.env.history.clear()
             self.env.save_history()
@@ -420,7 +423,7 @@ class InteractiveShell:
                 print(path)
             return 0
 
-        if args[0] == 'add' and len(args) > 1:
+        if args[0] == "add" and len(args) > 1:
             # Add to path
             self.env.add_to_path(os.path.expanduser(args[1]))
             return 0
@@ -435,7 +438,7 @@ class InteractiveShell:
 
     def _handle_clear(self, args: list[str]) -> int:
         """Handle clear command"""
-        os.system('cls' if os.name == 'nt' else 'clear')
+        os.system("cls" if os.name == "nt" else "clear")
         return 0
 
     def _handle_echo(self, args: list[str]) -> int:
@@ -443,14 +446,14 @@ class InteractiveShell:
         # Process environment variable expansion
         processed_args = []
         for arg in args:
-            if arg.startswith('$'):
+            if arg.startswith("$"):
                 var_name = arg[1:]
-                var_value = self.env.get_env_var(var_name) or ''
+                var_value = self.env.get_env_var(var_name) or ""
                 processed_args.append(var_value)
             else:
                 processed_args.append(arg)
 
-        print(' '.join(processed_args))
+        print(" ".join(processed_args))
         return 0
 
     def _process_internal_command(self, command: str) -> tuple[bool, int]:
@@ -483,11 +486,11 @@ class InteractiveShell:
         self.env.add_to_history(command)
 
         # Check for pipes
-        if '|' in command:
+        if "|" in command:
             return self._execute_pipeline(command)
 
         # Check for redirections
-        if '>' in command or '<' in command:
+        if ">" in command or "<" in command:
             return self._execute_with_redirection(command)
 
         # Try to execute as internal command
@@ -514,7 +517,7 @@ class InteractiveShell:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                env=self.env.get_env()
+                env=self.env.get_env(),
             )
 
             # Read output
@@ -528,9 +531,9 @@ class InteractiveShell:
             else:
                 # Print output directly
                 if stdout_data:
-                    print(stdout_data, end='')
+                    print(stdout_data, end="")
                 if stderr_data:
-                    print(stderr_data, end='', file=sys.stderr)
+                    print(stderr_data, end="", file=sys.stderr)
 
             # Return exit code
             return self.current_process.returncode
@@ -551,7 +554,7 @@ class InteractiveShell:
         """Execute a command pipeline"""
         try:
             # Split the pipeline into individual commands
-            commands = [cmd.strip() for cmd in command.split('|')]
+            commands = [cmd.strip() for cmd in command.split("|")]
             if not all(commands):
                 print("Invalid pipeline syntax", file=sys.stderr)
                 return 1
@@ -578,7 +581,7 @@ class InteractiveShell:
                     stdout=stdout,
                     stderr=subprocess.PIPE,
                     text=True,
-                    env=self.env.get_env()
+                    env=self.env.get_env(),
                 )
 
                 processes.append(process)
@@ -603,9 +606,9 @@ class InteractiveShell:
             else:
                 # Print output directly
                 if stdout_data:
-                    print(stdout_data, end='')
+                    print(stdout_data, end="")
                 if all_stderr:
-                    print(all_stderr, end='', file=sys.stderr)
+                    print(all_stderr, end="", file=sys.stderr)
 
             # Return exit code from the last process
             return final_process.returncode
@@ -623,25 +626,25 @@ class InteractiveShell:
             append_output = False
 
             # Handle input redirection
-            if '<' in command:
-                parts = command.split('<', 1)
+            if "<" in command:
+                parts = command.split("<", 1)
                 command = parts[0].strip()
-                input_parts = parts[1].strip().split('>', 1)
+                input_parts = parts[1].strip().split(">", 1)
                 input_file = input_parts[0].strip()
                 if len(input_parts) > 1:
                     output_part = input_parts[1]
-                    if output_part.startswith('>'):
+                    if output_part.startswith(">"):
                         append_output = True
                         output_file = output_part[1:].strip()
                     else:
                         output_file = output_part.strip()
 
             # Handle output redirection
-            if '>' in command and not output_file:
-                parts = command.split('>', 1)
+            if ">" in command and not output_file:
+                parts = command.split(">", 1)
                 command = parts[0].strip()
                 output_part = parts[1].strip()
-                if output_part.startswith('>'):
+                if output_part.startswith(">"):
                     append_output = True
                     output_file = output_part[1:].strip()
                 else:
@@ -655,7 +658,7 @@ class InteractiveShell:
             # Open the output file if specified
             stdout = None
             if output_file:
-                stdout = open(output_file, 'a' if append_output else 'w')
+                stdout = open(output_file, "a" if append_output else "w")
 
             # Execute the command
             expanded_command = self.env.get_expanded_command(command)
@@ -695,7 +698,7 @@ class InteractiveShell:
                 stdout=stdout,
                 stderr=subprocess.PIPE,
                 text=True,
-                env=self.env.get_env()
+                env=self.env.get_env(),
             )
 
             # Get stderr output
@@ -703,7 +706,7 @@ class InteractiveShell:
 
             # Print stderr
             if stderr_data:
-                print(stderr_data, end='', file=sys.stderr)
+                print(stderr_data, end="", file=sys.stderr)
 
             # Close files
             if stdin:
@@ -759,6 +762,7 @@ class InteractiveShell:
         if self.current_process:
             with contextlib.suppress(Exception):
                 self.current_process.terminate()
+
 
 class PseudoTerminal:
     """Pseudo-terminal for running interactive programs"""
@@ -819,7 +823,7 @@ class PseudoTerminal:
 
                 if self.fd in r:
                     try:
-                        data = os.read(self.fd, 1024).decode('utf-8', errors='replace')
+                        data = os.read(self.fd, 1024).decode("utf-8", errors="replace")
 
                         if data:
                             if self.output_callback:
@@ -858,7 +862,7 @@ class PseudoTerminal:
             return False
 
         try:
-            os.write(self.fd, data.encode('utf-8'))
+            os.write(self.fd, data.encode("utf-8"))
             return True
         except Exception as e:
             logger.error(f"Error writing to PTY: {e}")
@@ -873,9 +877,7 @@ class PseudoTerminal:
             import struct
             import termios
 
-            fcntl.ioctl(self.fd,
-                       termios.TIOCSWINSZ,
-                       struct.pack('HHHH', rows, cols, 0, 0))
+            fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, cols, 0, 0))
             return True
         except Exception as e:
             logger.error(f"Error resizing PTY: {e}")
@@ -902,72 +904,73 @@ class PseudoTerminal:
         """Check if the process is still running"""
         return self.running
 
+
 class ShellCommandHelper:
     """Helper for shell command suggestions and documentation"""
 
     def __init__(self):
         # Common commands with descriptions
         self.common_commands = {
-            'ls': "List directory contents",
-            'cd': "Change directory",
-            'pwd': "Print working directory",
-            'mkdir': "Create directory",
-            'rm': "Remove files or directories",
-            'cp': "Copy files or directories",
-            'mv': "Move/rename files or directories",
-            'cat': "Display file contents",
-            'less': "View file contents page by page",
-            'grep': "Search for patterns in files",
-            'find': "Find files in directory hierarchy",
-            'echo': "Display text",
-            'touch': "Create empty file or update timestamp",
-            'chmod': "Change file permissions",
-            'chown': "Change file owner and group",
-            'ps': "Show process status",
-            'kill': "Terminate processes",
-            'top': "Monitor system processes",
-            'df': "Display disk space usage",
-            'du': "Display file and directory space usage",
-            'tar': "Manipulate archive files",
-            'gzip': "Compress/decompress files",
-            'ssh': "Secure shell remote login",
-            'scp': "Secure copy files between hosts",
-            'wget': "Download files from the web",
-            'curl': "Transfer data from/to a server",
-            'ping': "Test network connection",
-            'ifconfig': "Configure network interfaces",
-            'netstat': "Show network status",
-            'history': "Show command history",
-            'alias': "Define or display aliases",
-            'export': "Set environment variables",
-            'env': "Display environment variables",
-            'which': "Show full path of commands",
-            'man': "Display command manual",
-            'git': "Version control system",
-            'python': "Python interpreter",
-            'npm': "Node package manager",
-            'docker': "Container platform"
+            "ls": "List directory contents",
+            "cd": "Change directory",
+            "pwd": "Print working directory",
+            "mkdir": "Create directory",
+            "rm": "Remove files or directories",
+            "cp": "Copy files or directories",
+            "mv": "Move/rename files or directories",
+            "cat": "Display file contents",
+            "less": "View file contents page by page",
+            "grep": "Search for patterns in files",
+            "find": "Find files in directory hierarchy",
+            "echo": "Display text",
+            "touch": "Create empty file or update timestamp",
+            "chmod": "Change file permissions",
+            "chown": "Change file owner and group",
+            "ps": "Show process status",
+            "kill": "Terminate processes",
+            "top": "Monitor system processes",
+            "df": "Display disk space usage",
+            "du": "Display file and directory space usage",
+            "tar": "Manipulate archive files",
+            "gzip": "Compress/decompress files",
+            "ssh": "Secure shell remote login",
+            "scp": "Secure copy files between hosts",
+            "wget": "Download files from the web",
+            "curl": "Transfer data from/to a server",
+            "ping": "Test network connection",
+            "ifconfig": "Configure network interfaces",
+            "netstat": "Show network status",
+            "history": "Show command history",
+            "alias": "Define or display aliases",
+            "export": "Set environment variables",
+            "env": "Display environment variables",
+            "which": "Show full path of commands",
+            "man": "Display command manual",
+            "git": "Version control system",
+            "python": "Python interpreter",
+            "npm": "Node package manager",
+            "docker": "Container platform",
         }
 
         # Command flags and options
         self.command_options = {
-            'ls': ['-l', '-a', '-h', '--color', '-R', '-S', '-t'],
-            'cp': ['-r', '-i', '-v', '-f', '-p', '-u'],
-            'rm': ['-r', '-f', '-i', '-v'],
-            'grep': ['-i', '-r', '-v', '-n', '-A', '-B', '-C', '--color'],
-            'find': ['-name', '-type', '-size', '-mtime', '-exec'],
-            'tar': ['-c', '-x', '-t', '-f', '-v', '-z', '-j'],
-            'git': ['clone', 'pull', 'push', 'commit', 'checkout', 'branch', 'status', 'log'],
-            'ssh': ['-p', '-i', '-L', '-R', '-D', '-f', '-N']
+            "ls": ["-l", "-a", "-h", "--color", "-R", "-S", "-t"],
+            "cp": ["-r", "-i", "-v", "-f", "-p", "-u"],
+            "rm": ["-r", "-f", "-i", "-v"],
+            "grep": ["-i", "-r", "-v", "-n", "-A", "-B", "-C", "--color"],
+            "find": ["-name", "-type", "-size", "-mtime", "-exec"],
+            "tar": ["-c", "-x", "-t", "-f", "-v", "-z", "-j"],
+            "git": ["clone", "pull", "push", "commit", "checkout", "branch", "status", "log"],
+            "ssh": ["-p", "-i", "-L", "-R", "-D", "-f", "-N"],
         }
 
         # Example usages
         self.command_examples = {
-            'ls': ["ls -la", "ls -lh --color", "ls -la | grep ^d"],
-            'find': ["find . -name '*.py'", "find /home -type d -name 'data'"],
-            'grep': ["grep -i 'error' log.txt", "grep -r 'TODO' ."],
-            'tar': ["tar -czvf archive.tar.gz folder/", "tar -xzvf archive.tar.gz"],
-            'git': ["git clone https://github.com/user/repo.git", "git commit -m 'message'"]
+            "ls": ["ls -la", "ls -lh --color", "ls -la | grep ^d"],
+            "find": ["find . -name '*.py'", "find /home -type d -name 'data'"],
+            "grep": ["grep -i 'error' log.txt", "grep -r 'TODO' ."],
+            "tar": ["tar -czvf archive.tar.gz folder/", "tar -xzvf archive.tar.gz"],
+            "git": ["git clone https://github.com/user/repo.git", "git commit -m 'message'"],
         }
 
     def get_command_suggestions(self, partial_command: str, max_suggestions: int = 5) -> list[str]:
@@ -977,31 +980,37 @@ class ShellCommandHelper:
             return list(self.common_commands.keys())[:max_suggestions]
 
         # Get the command and current argument being typed
-        parts = shlex.split(partial_command) if partial_command.endswith(' ') else shlex.split(partial_command[:-1] + 'X')
-        command = parts[0] if parts else ''
+        parts = (
+            shlex.split(partial_command)
+            if partial_command.endswith(" ")
+            else shlex.split(partial_command[:-1] + "X")
+        )
+        command = parts[0] if parts else ""
 
         # Suggest commands when typing the command name
-        if len(parts) <= 1 and not partial_command.endswith(' '):
+        if len(parts) <= 1 and not partial_command.endswith(" "):
             matches = [cmd for cmd in self.common_commands if cmd.startswith(command)]
             return matches[:max_suggestions]
 
         # Suggest options for known commands
         if command in self.command_options and len(parts) > 1:
             current_arg = parts[-1]
-            if current_arg.startswith('-'):
-                matches = [opt for opt in self.command_options[command] if opt.startswith(current_arg)]
+            if current_arg.startswith("-"):
+                matches = [
+                    opt for opt in self.command_options[command] if opt.startswith(current_arg)
+                ]
                 return matches[:max_suggestions]
 
         # Suggest file paths if argument doesn't start with '-'
-        if len(parts) > 1 and not parts[-1].startswith('-'):
+        if len(parts) > 1 and not parts[-1].startswith("-"):
             path = parts[-1]
 
             # Handle relative and absolute paths
-            if path.startswith('/'):
-                base_dir = os.path.dirname(path) or '/'
+            if path.startswith("/"):
+                base_dir = os.path.dirname(path) or "/"
                 prefix = os.path.basename(path)
             else:
-                base_dir = os.path.dirname(path) or '.'
+                base_dir = os.path.dirname(path) or "."
                 prefix = os.path.basename(path)
 
             try:
@@ -1012,7 +1021,7 @@ class ShellCommandHelper:
                         if entry.startswith(prefix):
                             full_path = os.path.join(base_dir, entry)
                             if os.path.isdir(full_path):
-                                entry += '/'
+                                entry += "/"
                             matches.append(entry)
 
                 return matches[:max_suggestions]
@@ -1024,13 +1033,14 @@ class ShellCommandHelper:
     def get_command_help(self, command: str) -> dict[str, Any]:
         """Get help information for a command"""
         result = {
-            'command': command,
-            'description': self.common_commands.get(command, "No description available"),
-            'options': self.command_options.get(command, []),
-            'examples': self.command_examples.get(command, [])
+            "command": command,
+            "description": self.common_commands.get(command, "No description available"),
+            "options": self.command_options.get(command, []),
+            "examples": self.command_examples.get(command, []),
         }
 
         return result
+
 
 def main():
     """Run interactive shell"""
@@ -1048,6 +1058,7 @@ def main():
     env.save_history()
 
     print("Shell session ended")
+
 
 if __name__ == "__main__":
     main()

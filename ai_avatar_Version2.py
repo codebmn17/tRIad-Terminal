@@ -17,11 +17,13 @@ try:
     from rich import box
     from rich.console import Console
     from rich.panel import Panel
+
     HAS_RICH = True
 except ImportError:
     HAS_RICH = False
 
 logger = logging.getLogger("triad.avatar")
+
 
 class AIAvatar:
     """Visual representation of the AI assistant"""
@@ -57,7 +59,7 @@ class AIAvatar:
     | \     )|_
    /`\_`>  <_/ \
    \__/'---'\__/
-        """
+        """,
     ]
 
     # Different avatar styles
@@ -86,7 +88,7 @@ class AIAvatar:
   /__|_____|__\
      |  |  |
      |__|__|
-            """
+            """,
         ],
         "brain": [
             r"""
@@ -116,7 +118,7 @@ class AIAvatar:
    \  \  \      /   /   /
     \   `--------'   /
      `--------------'
-            """
+            """,
         ],
         "ghost": [
             r"""
@@ -132,7 +134,7 @@ class AIAvatar:
      | O |
      |   |
      '~~~'
-            """
+            """,
         ],
         "pixel": [
             r"""
@@ -158,12 +160,13 @@ class AIAvatar:
      │ ■■■ │
      │     │
      └─────┘
-            """
-        ]
+            """,
+        ],
     }
 
-    def __init__(self, style: str = "robot", color: str = "cyan",
-                data_dir: str = "~/.triad/avatar"):
+    def __init__(
+        self, style: str = "robot", color: str = "cyan", data_dir: str = "~/.triad/avatar"
+    ):
         self.data_dir = os.path.expanduser(data_dir)
         os.makedirs(self.data_dir, exist_ok=True)
 
@@ -190,7 +193,9 @@ class AIAvatar:
                 with open(custom_avatar_file) as f:
                     avatar_data = json.load(f)
 
-                if isinstance(avatar_data, list) and all(isinstance(frame, str) for frame in avatar_data):
+                if isinstance(avatar_data, list) and all(
+                    isinstance(frame, str) for frame in avatar_data
+                ):
                     logger.info("Loaded custom avatar")
                     return avatar_data
 
@@ -239,13 +244,15 @@ class AIAvatar:
 
         if HAS_RICH:
             console = Console()
-            console.print(Panel(
-                frame,
-                border_style=self.color,
-                box=box.ROUNDED,
-                title="AI Assistant",
-                title_align="center"
-            ))
+            console.print(
+                Panel(
+                    frame,
+                    border_style=self.color,
+                    box=box.ROUNDED,
+                    title="AI Assistant",
+                    title_align="center",
+                )
+            )
         else:
             print(frame)
 
@@ -256,10 +263,7 @@ class AIAvatar:
             return
 
         self.stop_event.clear()
-        self.animation_thread = threading.Thread(
-            target=self._animation_loop,
-            args=(duration, fps)
-        )
+        self.animation_thread = threading.Thread(target=self._animation_loop, args=(duration, fps))
         self.animation_thread.daemon = True
         self.animation_thread.start()
 
@@ -277,10 +281,10 @@ class AIAvatar:
         try:
             while not self.stop_event.is_set() and (time.time() - start_time < duration):
                 # Clear the console (platform-specific)
-                if os.name == 'nt':  # Windows
-                    os.system('cls')
+                if os.name == "nt":  # Windows
+                    os.system("cls")
                 else:  # Unix/Linux/MacOS
-                    os.system('clear')
+                    os.system("clear")
 
                 # Display current frame
                 self.display()
@@ -301,8 +305,7 @@ class AIAvatar:
 
         self.stop_event.clear()
         self.animation_thread = threading.Thread(
-            target=self._speak_animation_loop,
-            args=(text, speed)
+            target=self._speak_animation_loop, args=(text, speed)
         )
         self.animation_thread.daemon = True
         self.animation_thread.start()
@@ -321,47 +324,50 @@ class AIAvatar:
                     self.current_frame = i % len(self.frames)
 
                     # Build text display
-                    displayed_text = text[:i+1]
-                    remaining = len(text) - (i+1)
+                    displayed_text = text[: i + 1]
+                    remaining = len(text) - (i + 1)
                     if remaining > 0:
                         displayed_text += "█" + " " * (remaining - 1)
 
                     # Clear screen and display
-                    os.system('cls' if os.name == 'nt' else 'clear')
+                    os.system("cls" if os.name == "nt" else "clear")
 
-                    console.print(Panel(
-                        self.frames[self.current_frame],
-                        border_style=self.color,
-                        box=box.ROUNDED,
-                        title="AI Assistant",
-                        title_align="center"
-                    ))
+                    console.print(
+                        Panel(
+                            self.frames[self.current_frame],
+                            border_style=self.color,
+                            box=box.ROUNDED,
+                            title="AI Assistant",
+                            title_align="center",
+                        )
+                    )
 
-                    console.print(Panel(
-                        displayed_text,
-                        border_style=self.color,
-                        title="Speaking",
-                        title_align="center"
-                    ))
+                    console.print(
+                        Panel(
+                            displayed_text,
+                            border_style=self.color,
+                            title="Speaking",
+                            title_align="center",
+                        )
+                    )
 
                     time.sleep(speed)
 
                 # Show complete text at the end
-                os.system('cls' if os.name == 'nt' else 'clear')
-                console.print(Panel(
-                    self.frames[0],
-                    border_style=self.color,
-                    box=box.ROUNDED,
-                    title="AI Assistant",
-                    title_align="center"
-                ))
+                os.system("cls" if os.name == "nt" else "clear")
+                console.print(
+                    Panel(
+                        self.frames[0],
+                        border_style=self.color,
+                        box=box.ROUNDED,
+                        title="AI Assistant",
+                        title_align="center",
+                    )
+                )
 
-                console.print(Panel(
-                    text,
-                    border_style=self.color,
-                    title="Message",
-                    title_align="center"
-                ))
+                console.print(
+                    Panel(text, border_style=self.color, title="Message", title_align="center")
+                )
             else:
                 # Simple animation without rich
                 for i, _char in enumerate(text):
@@ -370,9 +376,9 @@ class AIAvatar:
 
                     self.current_frame = i % len(self.frames)
 
-                    os.system('cls' if os.name == 'nt' else 'clear')
+                    os.system("cls" if os.name == "nt" else "clear")
                     print(self.frames[self.current_frame])
-                    print("\n" + text[:i+1])
+                    print("\n" + text[: i + 1])
 
                     time.sleep(speed)
 

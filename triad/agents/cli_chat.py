@@ -31,7 +31,6 @@ def banner(room: str, mode: str) -> None:
     print(color("dim", "Type your message. Use /help for commands. Ctrl+C to exit."))
 
 
-
 def format_line(room: str, sender: str, role: str, text: str) -> str:
     head = f"[{room}] {sender}:{' ' if sender else ''}"
     return f"{color('cyan', head)} {text}"
@@ -49,8 +48,8 @@ class MessageDisplayAgent(Agent):
 
         # Get the role icon
         icon = ""
-        if hasattr(msg, 'meta') and 'icon' in msg.meta:
-            icon = msg.meta['icon']
+        if hasattr(msg, "meta") and "icon" in msg.meta:
+            icon = msg.meta["icon"]
 
         # Format and display the message
         role_prefix = f"{icon} {msg.role}" if icon else msg.role
@@ -101,17 +100,18 @@ async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None
                 cmd = cmd.lower()
 
                 if cmd == "help":
-                    print("Commands:\n"
-                          "  /rooms                     List rooms\n"
-                          "  /room new <name>           Create & switch room\n"
-                          "  /join <name>               Switch room\n"
-                          "  /mode <safe|anon|triad>    Set mode for current room\n"
-                          "  /core set <topic> <text>   Save core memory note\n"
-                          "  /core get <topic>          Show core memory topic\n"
-                          "  /core list                 List core topics\n"
-                          "  /core del <topic>          Delete core topic\n"
-                          "  /save                      Flush (no‑op for JSONL)\n"
-                          )
+                    print(
+                        "Commands:\n"
+                        "  /rooms                     List rooms\n"
+                        "  /room new <name>           Create & switch room\n"
+                        "  /join <name>               Switch room\n"
+                        "  /mode <safe|anon|triad>    Set mode for current room\n"
+                        "  /core set <topic> <text>   Save core memory note\n"
+                        "  /core get <topic>          Show core memory topic\n"
+                        "  /core list                 List core topics\n"
+                        "  /core del <topic>          Delete core topic\n"
+                        "  /save                      Flush (no‑op for JSONL)\n"
+                    )
                     continue
 
                 if cmd == "rooms":
@@ -175,7 +175,11 @@ async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None
                     if sub == "del" and len(args) >= 2:
                         topic = args[1]
                         ok = store.core_del(topic)
-                        print(color("yellow", f"[core] deleted '{topic}'") if ok else color("yellow", f"[core] not found '{topic}'"))
+                        print(
+                            color("yellow", f"[core] deleted '{topic}'")
+                            if ok
+                            else color("yellow", f"[core] not found '{topic}'")
+                        )
                         continue
 
                 if cmd == "save":
@@ -188,7 +192,9 @@ async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None
 
             # normal user message
             meta = {"mode": modes.get_mode(current_room)}
-            await router.post(Message(room=current_room, sender="you", content=line, role="user", meta=meta))
+            await router.post(
+                Message(room=current_room, sender="you", content=line, role="user", meta=meta)
+            )
 
     except KeyboardInterrupt:
         print("\nbye")
@@ -198,10 +204,20 @@ async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Triad Terminal multi‑agent chat")
-    parser.add_argument("--agents", nargs="*", default=["PlannerAgent", "CriticAgent", "ExecutorAgent"], help="List of agent class names to load")
+    parser.add_argument(
+        "--agents",
+        nargs="*",
+        default=["PlannerAgent", "CriticAgent", "ExecutorAgent"],
+        help="List of agent class names to load",
+    )
     parser.add_argument("--room", default="main")
     parser.add_argument("--data-dir", default=".triad", help="Data directory for memory store")
-    parser.add_argument("--mem-max", type=int, default=10_000, help="Max messages per room to keep in rolling buffer")
+    parser.add_argument(
+        "--mem-max",
+        type=int,
+        default=10_000,
+        help="Max messages per room to keep in rolling buffer",
+    )
     args = parser.parse_args()
 
     builtins = discover_builtin_agents()

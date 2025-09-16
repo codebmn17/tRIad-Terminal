@@ -19,6 +19,7 @@ _MODEL_PATH = os.path.join(_MODEL_DIR, "random_forest_iris.joblib")
 # Feature names for echoing inputs back
 _FEATURE_NAMES = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
 
+
 def _get_target_names() -> list[str]:
     global _TARGET_NAMES
     if _TARGET_NAMES is None:
@@ -55,12 +56,15 @@ def _validate_x(x: list[float]) -> list[float]:
     if not isinstance(x, (list, tuple)):
         raise ValueError("x must be a list of 4 numeric values.")
     if len(x) != 4:
-        raise ValueError("x must have length 4: [sepal_length, sepal_width, petal_length, petal_width].")
+        raise ValueError(
+            "x must have length 4: [sepal_length, sepal_width, petal_length, petal_width]."
+        )
     try:
         floats = [float(v) for v in x]
     except Exception as e:
         raise ValueError(f"x must be numeric: {e}") from e
     return floats
+
 
 def predict(x: list[float]) -> dict[str, Any]:
     """

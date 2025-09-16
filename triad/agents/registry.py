@@ -28,7 +28,7 @@ def discover_builtin_agents() -> Dict[str, Type[Agent]]:
         from .builtins.executor import ExecutorAgent
         registry["ExecutorAgent"] = ExecutorAgent
     except ImportError:
-        
+        pass
     
     try:
         from .builtins.recorder import RecorderAgent

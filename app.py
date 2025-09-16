@@ -17,8 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class FeaturesIn(BaseModel):
-    features: list[float] = Field(..., description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]")
+    features: list[float] = Field(
+        ...,
+        description="Four numeric values [sepal_length, sepal_width, petal_length, petal_width]",
+    )
 
     @validator("features")
     def check_len_and_numbers(cls, v):
@@ -30,9 +34,15 @@ class FeaturesIn(BaseModel):
             raise ValueError("features must be numeric") from e
         return v
 
+
 @app.get("/")
 def root():
-    return {"ok": True, "message": "Triad Learning API is running", "endpoints": ["/predict/knn", "/predict/forest"]}
+    return {
+        "ok": True,
+        "message": "Triad Learning API is running",
+        "endpoints": ["/predict/knn", "/predict/forest"],
+    }
+
 
 @app.post("/predict/knn")
 def predict_knn_endpoint(inp: FeaturesIn):
@@ -40,6 +50,7 @@ def predict_knn_endpoint(inp: FeaturesIn):
         return predict_knn(inp.features)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+
 
 @app.post("/predict/forest")
 def predict_forest_endpoint(inp: FeaturesIn):

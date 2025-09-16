@@ -24,9 +24,9 @@ from typing import Any
 logger = logging.getLogger(__name__)
 if not logger.handlers:
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )
+
 
 class VoiceManager:
     """Manages voice interaction capabilities"""
@@ -44,7 +44,7 @@ class VoiceManager:
             "voice_type": "default",
             "volume": 80,
             "speaking_rate": 1.0,
-            "notification_sounds": True
+            "notification_sounds": True,
         }
 
         # Load configuration
@@ -95,20 +95,21 @@ class VoiceManager:
         try:
             # Try pyttsx3 first (offline, works on most platforms)
             import pyttsx3
+
             self.tts_engine = pyttsx3.init()
 
             # Configure the engine
-            self.tts_engine.setProperty('rate', int(self.config["speaking_rate"] * 200))  # Speed
-            self.tts_engine.setProperty('volume', self.config["volume"] / 100)  # Volume (0-1)
+            self.tts_engine.setProperty("rate", int(self.config["speaking_rate"] * 200))  # Speed
+            self.tts_engine.setProperty("volume", self.config["volume"] / 100)  # Volume (0-1)
 
             # Set voice type if available
-            voices = self.tts_engine.getProperty('voices')
+            voices = self.tts_engine.getProperty("voices")
             voice_type = self.config["voice_type"].lower()
 
             for voice in voices:
                 # Try to match the requested voice type
                 if voice_type in voice.name.lower():
-                    self.tts_engine.setProperty('voice', voice.id)
+                    self.tts_engine.setProperty("voice", voice.id)
                     break
 
             logger.info("Initialized pyttsx3 TTS engine")
@@ -133,10 +134,12 @@ class VoiceManager:
                 def say(self, text):
                     try:
                         # Generate unique filename (same text -> same name, fine for temps)
-                        temp_file = os.path.join(self.temp_dir, f"tts_{(hash(text) & 0xffffffff)}.mp3")
+                        temp_file = os.path.join(
+                            self.temp_dir, f"tts_{(hash(text) & 0xffffffff)}.mp3"
+                        )
 
                         # Generate speech
-                        tts = gTTS(text=text, lang='en', slow=(self.rate < 0.9))
+                        tts = gTTS(text=text, lang="en", slow=(self.rate < 0.9))
                         tts.save(temp_file)
 
                         # Play the audio (blocking to serialize playback)
@@ -153,8 +156,7 @@ class VoiceManager:
                     pass
 
             self.tts_engine = GTTSWrapper(
-                volume=self.config["volume"] / 100,
-                rate=self.config["speaking_rate"]
+                volume=self.config["volume"] / 100, rate=self.config["speaking_rate"]
             )
 
             logger.info("Initialized gTTS engine")
@@ -177,6 +179,7 @@ class VoiceManager:
         try:
             # Try speech_recognition library
             import speech_recognition as sr
+
             self.stt_engine = sr.Recognizer()
             logger.info("Initialized speech recognition engine")
         except ImportError:
@@ -221,7 +224,9 @@ class VoiceManager:
                 # Adjust for ambient noise
                 self.stt_engine.adjust_for_ambient_noise(source)
                 # Listen for audio
-                audio = self.stt_engine.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+                audio = self.stt_engine.listen(
+                    source, timeout=timeout, phrase_time_limit=phrase_time_limit
+                )
 
                 try:
                     # Use Google's speech recognition
@@ -238,7 +243,9 @@ class VoiceManager:
             logger.error(f"Error during speech recognition: {e}")
             return None
 
-    def listen_for_trigger(self, callback: Callable[[str], None], stop_event: threading.Event) -> None:
+    def listen_for_trigger(
+        self, callback: Callable[[str], None], stop_event: threading.Event
+    ) -> None:
         """Listen continuously for trigger phrase"""
         if not self.config["voice_recognition_enabled"] or not self.stt_engine:
             return
@@ -321,10 +328,12 @@ class VoiceManager:
                 "notification": "notification.wav",
                 "activation": "activation.wav",
                 "error": "error.wav",
-                "success": "success.wav"
+                "success": "success.wav",
             }
 
-            sound_file = os.path.join(self.config_dir, "sounds", sounds.get(sound_type, "notification.wav"))
+            sound_file = os.path.join(
+                self.config_dir, "sounds", sounds.get(sound_type, "notification.wav")
+            )
 
             # Ensure sounds directory exists
             sounds_dir = os.path.join(self.config_dir, "sounds")
@@ -350,7 +359,7 @@ class VoiceManager:
 
             def gen_tone(freq: float, dur: float) -> array.array:
                 n_samples = int(sample_rate * dur)
-                data = array.array('h')
+                data = array.array("h")
                 for i in range(n_samples):
                     # simple sine wave
                     sample = int(amplitude * math.sin(2 * math.pi * freq * (i / sample_rate)))
@@ -366,10 +375,12 @@ class VoiceManager:
                 # Short pleasant chord (C5-E5-G5)
                 dur = 0.18
                 n_samples = int(sample_rate * dur)
-                data = array.array('h')
+                data = array.array("h")
                 freqs = [523.25, 659.25, 783.99]
                 for i in range(n_samples):
-                    val = sum(math.sin(2 * math.pi * f * (i / sample_rate)) for f in freqs) / len(freqs)
+                    val = sum(math.sin(2 * math.pi * f * (i / sample_rate)) for f in freqs) / len(
+                        freqs
+                    )
                     sample = int(amplitude * val)
                     data.append(sample)
             else:
@@ -377,7 +388,7 @@ class VoiceManager:
                 data = gen_tone(440, duration)
 
             # Write WAV
-            with wave.open(output_file, 'w') as wf:
+            with wave.open(output_file, "w") as wf:
                 wf.setnchannels(1)
                 wf.setsampwidth(2)  # 16-bit
                 wf.setframerate(44100)
@@ -388,10 +399,11 @@ class VoiceManager:
             logger.warning(f"Could not generate notification sound ({sound_type}): {e}")
             # Create an empty file as a placeholder
             try:
-                with open(output_file, 'wb') as f:
-                    f.write(b'')
+                with open(output_file, "wb") as f:
+                    f.write(b"")
             except Exception:
                 pass
+
 
 class VoiceCommands:
     """Handles voice command parsing and execution"""
@@ -405,7 +417,7 @@ class VoiceCommands:
             "open": ["open", "launch", "start", "run"],
             "close": ["close", "exit", "quit", "stop"],
             "deploy": ["deploy", "publish", "upload"],
-            "status": ["status", "info", "how is", "what is the status"]
+            "status": ["status", "info", "how is", "what is the status"],
         }
 
     def parse_command(self, text: str) -> tuple[str, dict[str, str]]:
@@ -418,7 +430,7 @@ class VoiceCommands:
             for pattern in patterns:
                 if text.startswith(pattern):
                     command_type = cmd
-                    text = text[len(pattern):].strip()
+                    text = text[len(pattern) :].strip()
                     break
             if command_type:
                 break
@@ -464,7 +476,9 @@ class VoiceCommands:
             return "Closing application"
 
         elif command_type == "deploy":
-            return self._deploy_command(params.get("project", ""), params.get("target", "production"))
+            return self._deploy_command(
+                params.get("project", ""), params.get("target", "production")
+            )
 
         elif command_type == "status":
             return self._status_command(params.get("target", "system"))
@@ -475,8 +489,10 @@ class VoiceCommands:
 
     def _help_command(self) -> str:
         """Handle help command"""
-        return ("I can help you with various tasks. Try commands like: "
-                "Open a project, Deploy an application, Check system status, or Close an application.")
+        return (
+            "I can help you with various tasks. Try commands like: "
+            "Open a project, Deploy an application, Check system status, or Close an application."
+        )
 
     def _open_command(self, target: str) -> str:
         """Handle open command"""

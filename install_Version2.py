@@ -16,13 +16,16 @@ from pathlib import Path
 
 def print_banner():
     """Print installation banner"""
-    print("""
+    print(
+        """
 ╔════════════════════════════════════════════════════════════════╗
 ║                   TRIAD TERMINAL INSTALLER                     ║
 ║                                                                ║
 ║  A secure and powerful development environment for your needs  ║
 ╚════════════════════════════════════════════════════════════════╝
-    """)
+    """
+    )
+
 
 def get_install_path():
     """Determine where to install Triad Terminal"""
@@ -47,15 +50,10 @@ def get_install_path():
 
     return install_path
 
+
 def check_dependencies():
     """Check and install required dependencies"""
-    required_packages = [
-        "rich",
-        "colorama",
-        "pyyaml",
-        "psutil",
-        "cryptography"
-    ]
+    required_packages = ["rich", "colorama", "pyyaml", "psutil", "cryptography"]
 
     print("\nChecking dependencies...")
 
@@ -74,20 +72,13 @@ def check_dependencies():
 
     return True
 
+
 def copy_files(install_path, source_dir="."):
     """Copy files to installation directory"""
     print(f"\nCopying files to {install_path}...")
 
     # Create directory structure
-    directories = [
-        "",
-        "bin",
-        "config",
-        "plugins",
-        "logs",
-        "security",
-        "ascii_art"
-    ]
+    directories = ["", "bin", "config", "plugins", "logs", "security", "ascii_art"]
 
     for directory in directories:
         full_path = os.path.join(install_path, directory)
@@ -107,7 +98,7 @@ def copy_files(install_path, source_dir="."):
         "monitoring_dashboard.py",
         "security_system.py",
         "enhanced_ui.py",
-        "secure_terminal.py"
+        "secure_terminal.py",
     ]
 
     for filename in module_files:
@@ -123,7 +114,8 @@ def copy_files(install_path, source_dir="."):
     # Create ASCII art
     matrix_file = os.path.join(install_path, "ascii_art", "matrix.py")
     with open(matrix_file, "w") as f:
-        f.write("""#!/usr/bin/env python3
+        f.write(
+            """#!/usr/bin/env python3
 import random
 import time
 import sys
@@ -215,12 +207,14 @@ if __name__ == "__main__":
             pass
     
     matrix_rain(duration)
-""")
+"""
+        )
 
     # Create launcher script
     launcher_path = os.path.join(install_path, "triad")
     with open(launcher_path, "w") as f:
-        f.write(f"""#!/bin/bash
+        f.write(
+            f"""#!/bin/bash
 # Triad Terminal Launcher
 
 # Set path to installation directory
@@ -228,7 +222,8 @@ TRIAD_HOME="{install_path}"
 
 # Execute the terminal
 python3 "$TRIAD_HOME/bin/secure_terminal.py" "$@"
-""")
+"""
+        )
 
     # Make the launcher executable
     try:
@@ -240,12 +235,15 @@ python3 "$TRIAD_HOME/bin/secure_terminal.py" "$@"
     if platform.system() == "Windows":
         win_launcher = os.path.join(install_path, "triad.bat")
         with open(win_launcher, "w") as f:
-            f.write(f"""@echo off
+            f.write(
+                f"""@echo off
 :: Triad Terminal Launcher for Windows
 python "{install_path}\\bin\\secure_terminal.py" %*
-""")
+"""
+            )
 
     return True
+
 
 def create_symlink(install_path):
     """Create a symlink to the launcher in a directory in PATH"""
@@ -256,10 +254,7 @@ def create_symlink(install_path):
         return True
 
     # Unix-like systems
-    bin_dirs = [
-        os.path.expanduser("~/.local/bin"),
-        os.path.expanduser("~/bin")
-    ]
+    bin_dirs = [os.path.expanduser("~/.local/bin"), os.path.expanduser("~/bin")]
 
     # Find a suitable bin directory
     bin_dir = None
@@ -299,10 +294,14 @@ def create_symlink(install_path):
         print(f"   alias triad='{source}'")
         return False
 
+
 def setup_initial_user(install_path):
     """Set up the initial admin user"""
     print("\nSetting up initial admin user...")
-    subprocess.call([sys.executable, os.path.join(install_path, "bin", "secure_terminal.py"), "--setup"])
+    subprocess.call(
+        [sys.executable, os.path.join(install_path, "bin", "secure_terminal.py"), "--setup"]
+    )
+
 
 def main():
     """Main installation function"""
@@ -343,6 +342,7 @@ def main():
     print("\nTo start the terminal, run: triad")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
