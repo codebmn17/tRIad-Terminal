@@ -5,60 +5,58 @@ Triad Terminal Secure Launcher
 Combines security system with enhanced UI
 """
 
-import os
-import sys
-import time
-import argparse
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+import os
+
+from enhanced_ui import TerminalUI
 
 # Import our modules
-from security_system import SecurityManager, AuthCLI
-from enhanced_ui import TerminalUI, ThemeManager, Animation
+from security_system import AuthCLI, SecurityManager
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler(os.path.expanduser("~/.triad/logs/triad.log")),
-        logging.StreamHandler()
-    ]
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger("triad.secure")
 
+
 class SecureTerminal:
     """Secured Triad Terminal with authentication and enhanced UI"""
-    
+
     def __init__(self, theme: str = "matrix"):
         self.security = SecurityManager()
         self.auth_cli = AuthCLI(self.security)
         self.ui = TerminalUI(theme)
         self.session_id = None
         self.username = None
-    
+
     def launch(self, skip_auth: bool = False, skip_intro: bool = False) -> bool:
         """Launch the secure terminal"""
         if not skip_intro:
             self.ui.clear_screen()
             self.ui.print_intro()
-        
+
         # Skip authentication if requested (development mode)
         if skip_auth:
             logger.warning("Authentication bypassed (development mode)")
             self.username = "dev_mode"
             return self.start_terminal()
-        
+
         # Perform authentication
         authenticated = False
-        
+
         # First try to get stored session
         session_file = os.path.expanduser("~/.triad/security/current_session")
         if os.path.exists(session_file):
             try:
-                with open(session_file, 'r') as f:
+                with open(session_file) as f:
                     stored_session = f.read().strip()
-                
+
                 # Validate the session
                 valid, username = self.security.validate_session(stored_session)
                 if valid and username:
@@ -68,7 +66,7 @@ class SecureTerminal:
                     logger.info(f"User {username} authenticated via stored session")
             except Exception as e:
                 logger.error(f"Error reading session file: {e}")
-        
+
         # If not authenticated via session, show login prompt
         if not authenticated:
             # Offer biometric option if enabled
@@ -78,7 +76,7 @@ class SecureTerminal:
                 print("1. Password Login")
                 print("2. Biometric Login")
                 choice = input("Select login method (1/2): ")
-                
+
                 if choice == "2":
                     success, result = self.auth_cli.biometric_login_prompt()
                     if success:
@@ -89,7 +87,7 @@ class SecureTerminal:
                             authenticated = True
                             # Save session for future use
                             self._save_session()
-            
+
             # If not authenticated via biometric, use password
             if not authenticated:
                 success, result = self.auth_cli.login_prompt()
@@ -101,51 +99,51 @@ class SecureTerminal:
                         authenticated = True
                         # Save session for future use
                         self._save_session()
-        
+
         # If authentication succeeded, start the terminal
         if authenticated:
             return self.start_terminal()
         else:
             print("\nAuthentication failed. Exiting.")
             return False
-    
+
     def _save_session(self) -> None:
         """Save current session to file for persistence"""
         if not self.session_id:
             return
-            
+
         try:
             session_dir = os.path.expanduser("~/.triad/security")
             os.makedirs(session_dir, exist_ok=True)
-            
-            with open(os.path.join(session_dir, "current_session"), 'w') as f:
+
+            with open(os.path.join(session_dir, "current_session"), "w") as f:
                 f.write(self.session_id)
         except Exception as e:
             logger.error(f"Error saving session: {e}")
-    
+
     def start_terminal(self) -> bool:
         """Start the terminal after successful authentication"""
         self.ui.clear_screen()
-        
+
         # Display welcome
         self.ui.print_header()
-        
+
         if self.username:
             self.ui.print_message(f"Welcome back, {self.username}!", "success")
         else:
             self.ui.print_message("Welcome to Triad Terminal!", "info")
-        
+
         # Display available commands
         commands = self._get_available_commands()
         self.ui.print_command_list(commands)
-        
+
         self.ui.print_footer()
-        
+
         # In a real implementation, you would enter a command loop here
         # For demonstration purposes, we'll just return success
         return True
-    
-    def _get_available_commands(self) -> List[Dict[str, str]]:
+
+    def _get_available_commands(self) -> list[dict[str, str]]:
         """Get available commands for the current user"""
         # Basic commands available to all users
         commands = [
@@ -154,12 +152,20 @@ class SecureTerminal:
             {"name": "monitor", "description": "System monitoring dashboard"},
             {"name": "tunnel", "description": "SSH tunnel management"},
             {"name": "theme", "description": "Change terminal theme"},
-            {"name": "help", "description": "Show help for commands"}
+            {"name": "help", "description": "Show help for commands"},
         ]
-        
+
         # Add admin commands if the user is an admin
         users = self.security._load_users()
         if self.username in users and users[self.username].get("admin", False):
+ copilot/fix-c1e50cd2-35ad-4991-8bc0-a59778375133
+            commands.extend(
+                [
+                    {"name": "users", "description": "User management"},
+                    {"name": "logs", "description": "View security logs"},
+                ]
+            )
+
             commands.extend([
                 {"name": "users", "description": "User management"},
                 {"name
@@ -173,3 +179,4 @@ class SecureTerminal:
         "description": "Session handling",
     }
 ])
+ main

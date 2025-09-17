@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 import joblib
 import numpy as np
@@ -7,10 +7,10 @@ from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
 
 # Cache target names once
-_TARGET_NAMES: Optional[List[str]] = None
+_TARGET_NAMES: list[str] | None = None
 
 # Cache model instance in-memory
-_MODEL: Optional[RandomForestClassifier] = None
+_MODEL: RandomForestClassifier | None = None
 
 # Model artifact path
 _MODEL_DIR = "models"
@@ -19,7 +19,8 @@ _MODEL_PATH = os.path.join(_MODEL_DIR, "random_forest_iris.joblib")
 # Feature names for echoing inputs back
 _FEATURE_NAMES = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
 
-def _get_target_names() -> List[str]:
+
+def _get_target_names() -> list[str]:
     global _TARGET_NAMES
     if _TARGET_NAMES is None:
         _TARGET_NAMES = load_iris().target_names.tolist()
@@ -51,18 +52,21 @@ def _load_or_train_model() -> RandomForestClassifier:
     return _MODEL
 
 
-def _validate_x(x: List[float]) -> List[float]:
+def _validate_x(x: list[float]) -> list[float]:
     if not isinstance(x, (list, tuple)):
         raise ValueError("x must be a list of 4 numeric values.")
     if len(x) != 4:
-        raise ValueError("x must have length 4: [sepal_length, sepal_width, petal_length, petal_width].")
+        raise ValueError(
+            "x must have length 4: [sepal_length, sepal_width, petal_length, petal_width]."
+        )
     try:
         floats = [float(v) for v in x]
     except Exception as e:
         raise ValueError(f"x must be numeric: {e}")
     return floats
 
-def predict(x: List[float]) -> Dict[str, Any]:
+
+def predict(x: list[float]) -> dict[str, Any]:
     """
     Predict using a cached RandomForestClassifier trained on the Iris dataset.
 
@@ -87,12 +91,12 @@ def predict(x: List[float]) -> Dict[str, Any]:
 
     # Map probabilities to target labels; ensure class order mapping
     class_labels = [target_names[int(c)] for c in model.classes_]
-    proba_map = {cls: float(p) for cls, p in zip(class_labels, proba_arr)}
+    proba_map = {cls: float(p) for cls, p in zip(class_labels, proba_arr, strict=False)}
 
     result = {
         "model": "forest",
         "label": target_names[pred_idx],
         "proba": proba_map,
-        "features": {k: float(v) for k, v in zip(_FEATURE_NAMES, features)},
+        "features": {k: float(v) for k, v in zip(_FEATURE_NAMES, features, strict=False)},
     }
     return result

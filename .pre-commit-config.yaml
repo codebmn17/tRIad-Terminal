@@ -16,7 +16,10 @@ repos:
         args: ["--fix"]
         exclude: |
           (?x)(
-            ^tests/api_tester.html$
+            ^tests/api_tester.html$|
+            ^src_main\.py$|
+            ^triad-terminal\.py$|
+            ^tests/api_tester\.py$
           )
 
   - repo: https://github.com/psf/black
@@ -26,5 +29,8 @@ repos:
         language_version: python3
         exclude: |
           (?x)(
-            ^tests/api_tester.html$
+            ^tests/api_tester.html$|
+            ^src_main\.py$|
+            ^triad-terminal\.py$|
+            ^tests/api_tester\.py$
           )

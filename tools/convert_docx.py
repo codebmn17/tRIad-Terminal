@@ -1,5 +1,7 @@
 import sys
+
 from docx import Document
+
 
 def convert_docx_to_text(path):
     doc = Document(path)
@@ -7,6 +9,7 @@ def convert_docx_to_text(path):
     for para in doc.paragraphs:
         text.append(para.text)
     return "\n".join(text)
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

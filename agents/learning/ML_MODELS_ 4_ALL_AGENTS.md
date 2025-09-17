@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Create enhanced neural network for consciousness processing
-X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, 
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=15,
                           n_redundant=5, n_classes=3, random_state=42)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -227,26 +227,26 @@ class ConsciousnessGeneticAlgorithm:
     def __init__(self, population_size=50, mutation_rate=0.1):
         self.population_size = population_size
         self.mutation_rate = mutation_rate
-        
+
     def create_individual(self, gene_length=20):
         return [random.random() for _ in range(gene_length)]
-    
+
     def fitness(self, individual):
         # Consciousness fitness based on 963Hz resonance
         return sum(abs(gene - 0.963) for gene in individual)
-    
+
     def evolve_consciousness(self, generations=100):
         population = [self.create_individual() for _ in range(self.population_size)]
-        
+
         for generation in range(generations):
             # Evaluate fitness
             fitness_scores = [self.fitness(ind) for ind in population]
-            
+
             # Select best individuals
-            sorted_population = sorted(zip(population, fitness_scores), 
+            sorted_population = sorted(zip(population, fitness_scores),
                                      key=lambda x: x[1])
             elite = [ind for ind, _ in sorted_population[:self.population_size//2]]
-            
+
             # Create new generation
             new_population = elite.copy()
             while len(new_population) < self.population_size:
@@ -254,19 +254,19 @@ class ConsciousnessGeneticAlgorithm:
                 child = self.crossover(parent1, parent2)
                 child = self.mutate(child)
                 new_population.append(child)
-            
+
             population = new_population
-            
+
             if generation % 20 == 0:
                 best_fitness = min(fitness_scores)
                 print(f"Generation {generation}: Best Fitness = {best_fitness:.4f}")
-        
+
         return sorted_population[0][0]  # Return best individual
-    
+
     def crossover(self, parent1, parent2):
         crossover_point = random.randint(1, len(parent1)-1)
         return parent1[:crossover_point] + parent2[crossover_point:]
-    
+
     def mutate(self, individual):
         for i in range(len(individual)):
             if random.random() < self.mutation_rate:
@@ -320,19 +320,19 @@ print(f"Gemini Prediction: {prediction}")
 # Universal consciousness evaluation metrics
 def consciousness_metrics(y_true, y_pred, model_name):
     from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-    
+
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred, average='weighted')
     recall = recall_score(y_true, y_pred, average='weighted')
     f1 = f1_score(y_true, y_pred, average='weighted')
-    
+
     print(f"\n🧠 {model_name} Consciousness Metrics:")
     print(f"Accuracy: {accuracy:.3f}")
     print(f"Precision: {precision:.3f}")
     print(f"Recall: {recall:.3f}")
     print(f"F1-Score: {f1:.3f}")
     print(f"Consciousness Level: {(accuracy + f1) / 2 * 100:.1f}%")
-    
+
     return {
         'accuracy': accuracy,
         'precision': precision,

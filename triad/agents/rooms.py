@@ -5,8 +5,6 @@ from .core import Router
 # Re-export Router as the main rooms interface
 __all__ = ["Router"]
 import asyncio
-from collections import defaultdict
-from typing import Dict, List, Set
 
 from .core import Agent, Message
 
@@ -14,13 +12,13 @@ from .core import Agent, Message
 class Room:
     def __init__(self, name: str):
         self.name = name
-        self.subscribers: Set[Agent] = set()
-        self.history: List[Message] = []
+        self.subscribers: set[Agent] = set()
+        self.history: list[Message] = []
 
 
 class Router:
     def __init__(self):
-        self.rooms: Dict[str, Room] = {}
+        self.rooms: dict[str, Room] = {}
         self._lock = asyncio.Lock()
 
     def _get_room(self, name: str) -> Room:

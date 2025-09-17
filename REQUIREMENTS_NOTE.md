@@ -40,7 +40,7 @@ These are **NOT** included in `requirements.txt` to keep the installation lightw
 pip install tensorflow>=2.10.0
 pip install torch>=1.12.0
 
-# Gradient Boosting (optional) 
+# Gradient Boosting (optional)
 pip install xgboost>=1.6.0
 
 # Enhanced NLP (optional)
@@ -111,7 +111,7 @@ else:
 
 ### API Responses
 - All endpoints remain functional even without optional dependencies
-- Response includes `source` field indicating "ml" or "heuristic" 
+- Response includes `source` field indicating "ml" or "heuristic"
 - Status endpoints report feature availability
 
 ### Error Handling

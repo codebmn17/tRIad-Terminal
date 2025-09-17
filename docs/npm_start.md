@@ -17,7 +17,7 @@ def project_list():
         print("No projects found.")
         return
 
-    projects = [d for d in os.listdir(projects_dir) 
+    projects = [d for d in os.listdir(projects_dir)
                 if os.path.isdir(os.path.join(projects_dir, d))]
 
     if not projects:

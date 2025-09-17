@@ -74,7 +74,7 @@ tRIad-Terminal/
 - `GET /assistant/health` - Assistant health check
 - `POST /assistant/predict_command` - Predict next command based on context
 - `POST /assistant/process_nl` - Process natural language commands
-- `POST /assistant/complete_code` - Get code completion suggestions  
+- `POST /assistant/complete_code` - Get code completion suggestions
 - `POST /assistant/feedback` - Provide feedback for learning
 - `POST /assistant/train` - Train assistant models
 - `GET /assistant/ml_status` - ML dependencies and model status

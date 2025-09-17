@@ -1,6 +1,6 @@
 /**
  * Triad Terminal Dark Theme
- * 
+ *
  * This CSS provides theming for web-based Triad Terminal interfaces.
  * Automatically applies dark cyberpunk styling with optional background wallpaper
  * and neon triangle emblem positioning.
@@ -21,18 +21,18 @@
 
 /* Base theme application */
 body.triad-theme {
-  background: linear-gradient(135deg, 
-    var(--triad-bg-primary) 0%, 
-    var(--triad-bg-secondary) 50%, 
+  background: linear-gradient(135deg,
+    var(--triad-bg-primary) 0%,
+    var(--triad-bg-secondary) 50%,
     #0d0d0d 100%);
-  
+
   /* Background wallpaper - fallback to gradient if image missing */
   background-image: url('/assets/images/triad-terminal-bg.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  
+
   /* Overlay gradient to ensure readability */
   position: relative;
 }
@@ -44,9 +44,9 @@ body.triad-theme::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(10, 10, 10, 0.8) 0%, 
-    rgba(26, 26, 26, 0.7) 50%, 
+  background: linear-gradient(135deg,
+    rgba(10, 10, 10, 0.8) 0%,
+    rgba(26, 26, 26, 0.7) 50%,
     rgba(13, 13, 13, 0.8) 100%);
   pointer-events: none;
   z-index: -1;
@@ -73,9 +73,9 @@ body.triad-theme::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--triad-glow) 50%, 
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--triad-glow) 50%,
     transparent 100%);
   opacity: 0.1;
   pointer-events: none;
@@ -196,12 +196,12 @@ body.triad-theme a:hover {
   .triad-header {
     padding: 8px 16px;
   }
-  
+
   .triad-header .title {
     font-size: 18px;
     letter-spacing: 1px;
   }
-  
+
   .triad-header .mask-icon,
   .triad-header .triangle-icon {
     width: 24px;
@@ -223,7 +223,7 @@ body.triad-theme a:hover {
   .triad-header .triangle-icon {
     animation: none;
   }
-  
+
   * {
     transition: none !important;
   }

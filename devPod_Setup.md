@@ -36,7 +36,7 @@ services:
     environment:
       - PASSWORD=your_secure_password
       - DOCKER_HOST=tcp://docker-socket-proxy:2375
-    
+
   gitea:
     image: gitea/gitea:latest
     restart: unless-stopped
@@ -47,14 +47,14 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
-  
+
   jupyter:
     image: jupyter/datascience-notebook:latest
     ports:
       - "8888:8888"
     volumes:
       - ./jupyter:/home/jovyan/work
-    
+
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy
     restart: unless-stopped
