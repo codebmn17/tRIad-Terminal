@@ -163,3 +163,16 @@ class SecureTerminal:
             commands.extend([
                 {"name": "users", "description": "User management"},
                 {"name
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
+                 commands.extend([
+    {
+        "name": "users",
+        "description": "User management",
+    },
+    {
+        "name": "sessions",
+        "description": "Session handling",
+    }
+])
+ main

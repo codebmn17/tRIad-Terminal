@@ -31,6 +31,10 @@ def discover_builtin_agents() -> Dict[str, Type[Agent]]:
 
 
     try:
+    from .builtins.recorder import RecorderAgent
+    registry["RecorderAgent"] = RecorderAgent
+except ImportError:
+    registry["RecorderAgent"] = None
         from .builtins.recorder import RecorderAgent
         registry["RecorderAgent"] = RecorderAgent
     except ImportError:

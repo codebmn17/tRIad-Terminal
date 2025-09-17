@@ -11,7 +11,9 @@ from fastapi.testclient import TestClient
 Test AI Assistant API endpoints.
 
 Tests the /assistant endpoints for command prediction, code completion,
-natural language processing, and feedback handling.
+"""
+Tests the /assistant endpoints for command prediction,
+code completion, natural language processing, and feedback handling.
 """
 
 import pytest

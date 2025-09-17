@@ -545,8 +545,15 @@ def plugins_create(plugin_name):
         f.write("""import click
 
 class Plugin:
+    class Plugin:
     """A Triad Terminal plugin"""
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
+    def __init__(self):
+        pass
+    
+ main
     def __init__(self):
         self.name = "PLUGIN_NAME"
 
