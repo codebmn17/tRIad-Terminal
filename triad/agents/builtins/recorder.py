@@ -17,3 +17,9 @@ class RecorderAgent(Agent):
         # Record without responding
         with contextlib.suppress(Exception):
             self._store.record(msg)
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
+        except Exception:
+            # Never crash the bus due to recording issues
+            pass
+ main

@@ -5,7 +5,9 @@ Triad Terminal Shell Interface
 Provides enhanced shell integration capabilities
 """
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
 import contextlib
+ main
 import fcntl
 import logging
 import os
@@ -762,6 +764,7 @@ class InteractiveShell:
         if self.current_process:
             with contextlib.suppress(Exception):
                 self.current_process.terminate()
+
 
 
 class PseudoTerminal:

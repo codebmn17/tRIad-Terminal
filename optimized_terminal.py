@@ -8,25 +8,25 @@ This version includes:
 - More efficient rendering
 """
 
-import os
-import sys
 import json
-import yaml
-import click
+import os
 import shutil
-import asyncio
 import subprocess
-from pathlib import Path
+import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from functools import lru_cache
-from concurrent.futures import ThreadPoolExecutor
+
+import click
+import yaml
 
 # Try imports with fallbacks for cross-platform compatibility
 try:
+    from rich import box
     from rich.console import Console
     from rich.panel import Panel
     from rich.table import Table
-    from rich import box
+
     has_rich = True
 except ImportError:
     has_rich = False
@@ -38,6 +38,7 @@ VERSION = "2.0.0"
 
 # Thread pool for background tasks
 executor = ThreadPoolExecutor(max_workers=4)
+
 
 # Cache for expensive operations
 @lru_cache(maxsize=32)
@@ -51,7 +52,7 @@ def get_theme_colors(theme_name):
             "error": "red",
             "success": "green",
             "warning": "yellow",
-            "info": "cyan"
+            "info": "cyan",
         },
         "cyberpunk": {
             "header": "blue",
@@ -60,7 +61,7 @@ def get_theme_colors(theme_name):
             "error": "red",
             "success": "green",
             "warning": "yellow",
-            "info": "blue"
+            "info": "blue",
         },
         "synthwave": {
             "header": "magenta",
@@ -69,7 +70,7 @@ def get_theme_colors(theme_name):
             "error": "red",
             "success": "green",
             "warning": "yellow",
-            "info": "blue"
+            "info": "blue",
         },
         "bloodmoon": {
             "header": "red",
@@ -78,13 +79,15 @@ def get_theme_colors(theme_name):
             "error": "yellow",
             "success": "magenta",
             "warning": "yellow",
-            "info": "red"
-        }
+            "info": "red",
+        },
     }
     return themes.get(theme_name, themes["matrix"])
 
+
 class Config:
     """Configuration manager with lazy loading"""
+
     _instance = None
     _config = None
 
@@ -110,21 +113,18 @@ class Config:
                 "theme": "matrix",
                 "plugins_enabled": ["git", "deployment", "api"],
                 "api_keys": {},
-                "user": {
-                    "name": os.environ.get("USER", "developer"),
-                    "email": ""
-                },
+                "user": {"name": os.environ.get("USER", "developer"), "email": ""},
                 "performance": {
                     "animations": True,
                     "parallel_operations": True,
-                    "cache_results": True
-                }
+                    "cache_results": True,
+                },
             }
             with open(self.config_file, "w") as f:
                 yaml.dump(default_config, f)
             self._config = default_config
         else:
-            with open(self.config_file, "r") as f:
+            with open(self.config_file) as f:
                 self._config = yaml.safe_load(f)
 
         return self._config
@@ -148,6 +148,7 @@ class Config:
         config[key] = value
         self.save()
 
+
 # Improved UI rendering with caching
 class TerminalUI:
     def __init__(self):
@@ -169,7 +170,7 @@ class TerminalUI:
 
         logo_path = os.path.join(BASE_DIR, "ascii_art", "logo.txt")
         try:
-            with open(logo_path, "r") as f:
+            with open(logo_path) as f:
                 self._cached_logo = f.read()
         except:
             self._cached_logo = "TRIAD TERMINAL"
@@ -184,6 +185,7 @@ class TerminalUI:
             user = self.config.get("user", {}).get("name", "user")
             status_line = f"{now} | User: {user}"
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             self.console.print(Panel(
                 f"{self.get_logo()}\n\n{status_line}",
                 border_style=self.current_theme["header"],
@@ -191,28 +193,60 @@ class TerminalUI:
                 expand=False,
                 padding=(1, 2)
             ))
+=
+            self.console.print(
+                Panel(
+                    f"{self.get_logo()}\n\n{status_line}",
+                    border_style=self.current_theme["header"],
+                    box=box.DOUBLE,
+                    expand=False,
+                    padding=(1, 2),
+                )
+            )
+>main
         else:
             # Fallback to simpler header
             from termcolor import colored
+
             print(colored("╔" + "═" * (self.term_width - 2) + "╗", self.current_theme["header"]))
 
             # Title centered
             title = "TRIAD TERMINAL"
             padding = (self.term_width - len(title) - 2) // 2
+< copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             print(colored("║", self.current_theme["header"]) + " " * padding +
                   colored(title, self.current_theme["accent"], attrs=["bold"]) +
                   " " * (self.term_width - len(title) - 2 - padding) +
                   colored("║", self.current_theme["header"]))
+
+            print(
+                colored("║", self.current_theme["header"])
+                + " " * padding
+                + colored(title, self.current_theme["accent"], attrs=["bold"])
+                + " " * (self.term_width - len(title) - 2 - padding)
+                + colored("║", self.current_theme["header"])
+            )
+ main
 
             # Current date/time and user
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             user = self.config.get("user", {}).get("name", "user")
             status_line = f"{now} | User: {user}"
             padding = (self.term_width - len(status_line) - 2) // 2
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             print(colored("║", self.current_theme["header"]) + " " * padding +
                   status_line +
                   " " * (self.term_width - len(status_line) - 2 - padding) +
                   colored("║", self.current_theme["header"]))
+
+            print(
+                colored("║", self.current_theme["header"])
+                + " " * padding
+                + status_line
+                + " " * (self.term_width - len(status_line) - 2 - padding)
+                + colored("║", self.current_theme["header"])
+            )
+ main
 
             print(colored("╚" + "═" * (self.term_width - 2) + "╝", self.current_theme["header"]))
 
@@ -223,6 +257,7 @@ class TerminalUI:
             plugins_enabled = ", ".join(self.config.get("plugins_enabled", []))
             status_line = f"Plugins: {plugins_enabled} | v{VERSION}"
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             self.console.print(Panel(
                 status_line,
                 border_style=self.current_theme["header"],
@@ -230,23 +265,47 @@ class TerminalUI:
                 expand=False,
                 padding=(0, 2)
             ))
+
+            self.console.print(
+                Panel(
+                    status_line,
+                    border_style=self.current_theme["header"],
+                    box=box.DOUBLE,
+                    expand=False,
+                    padding=(0, 2),
+                )
+            )
+ main
         else:
             from termcolor import colored
+
             # Fallback to simpler footer
             print(colored("╔" + "═" * (self.term_width - 2) + "╗", self.current_theme["header"]))
 
             # Status information
             plugins_enabled = ", ".join(self.config.get("plugins_enabled", []))
             status_line = f"Plugins: {plugins_enabled} | v{VERSION}"
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             print(colored("║", self.current_theme["header"]) + " " + status_line +
                   " " * (self.term_width - len(status_line) - 3) +
                   colored("║", self.current_theme["header"]))
 
+            print(
+                colored("║", self.current_theme["header"])
+                + " "
+                + status_line
+                + " " * (self.term_width - len(status_line) - 3)
+                + colored("║", self.current_theme["header"])
+            )
+ main
+
             print(colored("╚" + "═" * (self.term_width - 2) + "╝", self.current_theme["header"]))
+
 
 # Plugin system
 class PluginManager:
     """Manages loading and running plugins"""
+
     def __init__(self):
         self.plugins = {}
         self.plugin_dir = os.path.join(BASE_DIR, "plugins")
@@ -264,7 +323,7 @@ class PluginManager:
                 manifest_path = os.path.join(plugin_path, "manifest.json")
                 if os.path.exists(manifest_path):
                     try:
-                        with open(manifest_path, 'r') as f:
+                        with open(manifest_path) as f:
                             manifest = json.load(f)
                             results[item] = manifest
                     except:
@@ -283,7 +342,7 @@ class PluginManager:
             return None
 
         try:
-            with open(manifest_path, 'r') as f:
+            with open(manifest_path) as f:
                 manifest = json.load(f)
 
             # Import main plugin file
@@ -295,7 +354,7 @@ class PluginManager:
             sys.path.pop(0)
 
             # Create plugin instance
-            if hasattr(plugin_module, 'Plugin'):
+            if hasattr(plugin_module, "Plugin"):
                 plugin = plugin_module.Plugin()
                 self.plugins[plugin_name] = plugin
                 return plugin
@@ -320,6 +379,10 @@ class PluginManager:
 
         return result
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
+
+main
 # Main CLI interface
 @click.group()
 @click.version_option(VERSION)
@@ -327,8 +390,9 @@ def cli():
     """Triad Terminal - Development Environment CLI"""
     pass
 
+
 @cli.command()
-@click.option('--no-animation', is_flag=True, help="Skip animations")
+@click.option("--no-animation", is_flag=True, help="Skip animations")
 def start(no_animation):
     """Start the Triad Terminal interface"""
     config = Config.get_instance()
@@ -336,9 +400,11 @@ def start(no_animation):
     plugin_manager = PluginManager()
 
     # Show matrix animation only if enabled and not skipped
-    if (config.get("theme") == "matrix" and
-            config.get("performance", {}).get("animations", True) and
-            not no_animation):
+    if (
+        config.get("theme") == "matrix"
+        and config.get("performance", {}).get("animations", True)
+        and not no_animation
+    ):
         matrix_script = os.path.join(BASE_DIR, "ascii_art", "matrix.py")
         if os.path.exists(matrix_script):
             try:
@@ -373,24 +439,43 @@ def start(no_animation):
         console.print("\nType 'triad COMMAND --help' for more information.\n")
     else:
         from termcolor import colored
+
         # Fallback to simpler output
         print("\nWelcome to Triad Terminal!\n")
         print("Available commands:")
-        print(colored("  project", ui.current_theme["accent"], attrs=["bold"]) + "    - Project management")
-        print(colored("  deploy", ui.current_theme["accent"], attrs=["bold"]) + "     - Deployment tools")
+        print(
+            colored("  project", ui.current_theme["accent"], attrs=["bold"])
+            + "    - Project management"
+        )
+        print(
+            colored("  deploy", ui.current_theme["accent"], attrs=["bold"])
+            + "     - Deployment tools"
+        )
         print(colored("  api", ui.current_theme["accent"], attrs=["bold"]) + "        - API tools")
-        print(colored("  github", ui.current_theme["accent"], attrs=["bold"]) + "     - GitHub integration")
-        print(colored("  config", ui.current_theme["accent"], attrs=["bold"]) + "     - Configure settings")
-        print(colored("  tunnel", ui.current_theme["accent"], attrs=["bold"]) + "     - SSH tunneling")
-        print(colored("  plugins", ui.current_theme["accent"], attrs=["bold"]) + "   - Manage plugins")
+        print(
+            colored("  github", ui.current_theme["accent"], attrs=["bold"])
+            + "     - GitHub integration"
+        )
+        print(
+            colored("  config", ui.current_theme["accent"], attrs=["bold"])
+            + "     - Configure settings"
+        )
+        print(
+            colored("  tunnel", ui.current_theme["accent"], attrs=["bold"]) + "     - SSH tunneling"
+        )
+        print(
+            colored("  plugins", ui.current_theme["accent"], attrs=["bold"]) + "   - Manage plugins"
+        )
         print("\nType 'triad COMMAND --help' for more information.\n")
 
     ui.print_footer()
+
 
 @cli.group()
 def plugins():
     """Plugin management commands"""
     pass
+
 
 @plugins.command("list")
 def plugins_list():
@@ -421,21 +506,20 @@ def plugins_list():
         for name, manifest in all_plugins.items():
             status = "[green]Enabled[/]" if name in enabled_plugins else "[gray]Disabled[/]"
             table.add_row(
-                name,
-                manifest.get("version", "0.1.0"),
-                status,
-                manifest.get("description", "")
+                name, manifest.get("version", "0.1.0"), status, manifest.get("description", "")
             )
 
         console.print("\n[bold]Installed Plugins:[/bold]")
         console.print(table)
     else:
         from termcolor import colored
+
         print(colored("Installed Plugins:", ui.current_theme["accent"], attrs=["bold"]))
         for name, manifest in all_plugins.items():
             status = colored("Enabled", "green") if name in enabled_plugins else "Disabled"
             print(f"  - {name} (v{manifest.get('version', '0.1.0')}) [{status}]")
             print(f"    {manifest.get('description', '')}")
+
 
 @plugins.command("enable")
 @click.argument("plugin_name")
@@ -450,9 +534,12 @@ def plugins_enable(plugin_name):
 
     if plugin_name not in all_plugins:
         if has_rich:
-            Console().print(f"[bold {ui.current_theme['error']}]Error:[/] Plugin {plugin_name} not found")
+            Console().print(
+                f"[bold {ui.current_theme['error']}]Error:[/] Plugin {plugin_name} not found"
+            )
         else:
             from termcolor import colored
+
             print(colored(f"Error: Plugin {plugin_name} not found", ui.current_theme["error"]))
         return
 
@@ -467,9 +554,12 @@ def plugins_enable(plugin_name):
     plugin = plugin_manager.load_plugin(plugin_name)
     if plugin is None:
         if has_rich:
-            Console().print(f"[bold {ui.current_theme['error']}]Error:[/] Failed to load plugin {plugin_name}")
+            Console().print(
+                f"[bold {ui.current_theme['error']}]Error:[/] Failed to load plugin {plugin_name}"
+            )
         else:
             from termcolor import colored
+
             print(colored(f"Error: Failed to load plugin {plugin_name}", ui.current_theme["error"]))
         return
 
@@ -481,7 +571,9 @@ def plugins_enable(plugin_name):
         Console().print(f"[bold {ui.current_theme['success']}]✅ Plugin {plugin_name} enabled[/]")
     else:
         from termcolor import colored
+
         print(colored(f"✅ Plugin {plugin_name} enabled", ui.current_theme["success"]))
+
 
 @plugins.command("disable")
 @click.argument("plugin_name")
@@ -507,7 +599,9 @@ def plugins_disable(plugin_name):
         Console().print(f"[bold {ui.current_theme['success']}]Plugin {plugin_name} disabled[/]")
     else:
         from termcolor import colored
+
         print(colored(f"Plugin {plugin_name} disabled", ui.current_theme["success"]))
+
 
 @plugins.command("create")
 @click.argument("plugin_name")
@@ -518,9 +612,12 @@ def plugins_create(plugin_name):
 
     if os.path.exists(plugin_dir):
         if has_rich:
-            Console().print(f"[bold {ui.current_theme['error']}]Error:[/] Plugin {plugin_name} already exists")
+            Console().print(
+                f"[bold {ui.current_theme['error']}]Error:[/] Plugin {plugin_name} already exists"
+            )
         else:
             from termcolor import colored
+
             print(colored(f"Error: Plugin {plugin_name} already exists", ui.current_theme["error"]))
         return
 
@@ -531,10 +628,10 @@ def plugins_create(plugin_name):
     manifest = {
         "name": plugin_name,
         "version": "0.1.0",
-        "description": f"A plugin for Triad Terminal",
+        "description": "A plugin for Triad Terminal",
         "author": Config.get_instance().get("user", {}).get("name", "Unknown"),
         "main": "plugin.py",
-        "commands": ["hello"]
+        "commands": ["hello"],
     }
 
     with open(os.path.join(plugin_dir, "manifest.json"), "w") as f:
@@ -542,9 +639,14 @@ def plugins_create(plugin_name):
 
     # Create plugin.py
     with open(os.path.join(plugin_dir, "plugin.py"), "w") as f:
-        f.write("""import click
+        f.write(
+            """import click
 
 class Plugin:
+ copilot/fix-c1e50cd2-35ad-4991-8bc0-a59778375133
+    \"\"\"A Triad Terminal plugin\"\"\"
+
+
     class Plugin:
     """A Triad Terminal plugin"""
 
@@ -558,22 +660,31 @@ class Plugin:
         self.name = "PLUGIN_NAME"
 
     def get_commands(self):
-        """Return a list of click commands this plugin provides"""
+        \"\"\"Return a list of click commands this plugin provides\"\"\"
         @click.command()
         def hello():
-            """Say hello from the plugin"""
+            \"\"\"Say hello from the plugin\"\"\"
             click.echo(f"Hello from {self.name} plugin!")
 
         return [hello]
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
 """.replace("PLUGIN_NAME", plugin_name))
+
+""".replace(
+                "PLUGIN_NAME", plugin_name
+            )
+        )
+ main
 
     if has_rich:
         Console().print(f"[bold {ui.current_theme['success']}]✅ Plugin {plugin_name} created[/]")
         Console().print(f"Location: {plugin_dir}")
     else:
         from termcolor import colored
+
         print(colored(f"✅ Plugin {plugin_name} created", ui.current_theme["success"]))
         print(f"Location: {plugin_dir}")
+
 
 # More performance improvements for the other commands would go here
 
@@ -593,5 +704,6 @@ if __name__ == "__main__":
             Console().print(f"[bold {theme['error']}]Error: {str(e)}[/]")
         else:
             from termcolor import colored
+
             print(colored(f"Error: {str(e)}", theme["error"]))
         sys.exit(1)

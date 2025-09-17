@@ -1,10 +1,10 @@
-
 #!/usr/bin/env python3
 
 """
 Triad Terminal with Voice Integration
 Combines security, enhanced UI, and voice capabilities
 """
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
 import pip install
 import pyttsx3
 import SpeechRecognition
@@ -14,26 +14,31 @@ import playsound
 import os
 import sys
 import time
+
+# Dependencies will be handled by pip install -r requirements.txt
+ main
 import argparse
-import threading
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+import os
+import sys
+
+from enhanced_ui import TerminalUI
 
 # Import our modules
-from security_system import SecurityManager, AuthCLI
-from enhanced_ui import TerminalUI, ThemeManager, Animation
-from voice_interface import VoiceManager, VoiceCommands
+from security_system import AuthCLI, SecurityManager
+from voice_interface import VoiceCommands, VoiceManager
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler(os.path.expanduser("~/.triad/logs/triad.log")),
-        logging.StreamHandler()
-    ]
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger("triad.integrated")
+
 
 class VoiceEnabledTerminal:
     """Triad Terminal with voice capabilities"""
@@ -49,7 +54,13 @@ class VoiceEnabledTerminal:
         self.voice_stop_event = None
         self.command_history = []
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
     def launch(self, skip_auth: bool = False, skip_intro: bool = False, enable_voice: bool = True) -> bool:
+
+    def launch(
+        self, skip_auth: bool = False, skip_intro: bool = False, enable_voice: bool = True
+    ) -> bool:
+ main
         """Launch the terminal"""
         if not skip_intro:
             self.ui.clear_screen()
@@ -83,7 +94,7 @@ class VoiceEnabledTerminal:
         session_file = os.path.expanduser("~/.triad/security/current_session")
         if os.path.exists(session_file):
             try:
-                with open(session_file, 'r') as f:
+                with open(session_file) as f:
                     stored_session = f.read().strip()
 
                 # Validate the session
@@ -140,7 +151,11 @@ class VoiceEnabledTerminal:
             session_dir = os.path.expanduser("~/.triad/security")
             os.makedirs(session_dir, exist_ok=True)
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             with open(os.path.join(session_dir, "current_session"), 'w') as f:
+
+            with open(os.path.join(session_dir, "current_session"), "w") as f:
+ main
                 f.write(self.session_id)
         except Exception as e:
             logger.error(f"Error saving session: {e}")
@@ -250,11 +265,23 @@ class VoiceEnabledTerminal:
         # Basic status items
         status_items = [
             {"name": "Terminal", "status": "Running", "details": "No issues detected"},
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             {"name": "Voice Assistant", "status": "Active" if self.voice_stop_event else "Inactive",
              "details": "Listening for commands" if self.voice_stop_event else "Not enabled"},
+
+            {
+                "name": "Voice Assistant",
+                "status": "Active" if self.voice_stop_event else "Inactive",
+                "details": "Listening for commands" if self.voice_stop_event else "Not enabled",
+            },
+main
             {"name": "Network", "status": "Connected", "details": "Internet access available"},
             {"name": "Projects", "status": "3 Active", "details": "No issues detected"},
-            {"name": "Deployments", "status": "None Active", "details": "Last deployment: 3 hours ago"}
+            {
+                "name": "Deployments",
+                "status": "None Active",
+                "details": "Last deployment: 3 hours ago",
+            },
         ]
 
         # Display in a table format if Rich is available
@@ -270,7 +297,11 @@ class VoiceEnabledTerminal:
             table.add_column("Details")
 
             for item in status_items:
-                status_style = "green" if "active" in item["status"].lower() or "running" in item["status"].lower() else "yellow"
+                status_style = (
+                    "green"
+                    if "active" in item["status"].lower() or "running" in item["status"].lower()
+                    else "yellow"
+                )
                 table.add_row(item["name"], f"[{status_style}]{item['status']}[/]", item["details"])
 
             console.print(table)
@@ -328,7 +359,11 @@ class VoiceEnabledTerminal:
 
         return response
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
     def _get_available_commands(self) -> List[Dict[str, str]]:
+
+    def _get_available_commands(self) -> list[dict[str, str]]:
+ main
         """Get available commands for the current user"""
         # Basic commands available to all users
         commands = [
@@ -338,18 +373,29 @@ class VoiceEnabledTerminal:
             {"name": "status", "description": "Show system status"},
             {"name": "voice <on|off|status>", "description": "Control voice assistant"},
             {"name": "clear", "description": "Clear the screen"},
-            {"name": "exit", "description": "Exit Triad Terminal"}
+            {"name": "exit", "description": "Exit Triad Terminal"},
         ]
 
         # Add admin commands if the user is an admin
         users = self.security._load_users()
         if self.username in users and users[self.username].get("admin", False):
+<<<< copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
             commands.extend([
                 {"name": "users", "description": "User management"},
                 {"name": "config", "description": "System configuration"},
                 {"name": "logs", "description": "View system logs"},
                 {"name": "backup", "description": "Manage backups"}
             ])
+
+            commands.extend(
+                [
+                    {"name": "users", "description": "User management"},
+                    {"name": "config", "description": "System configuration"},
+                    {"name": "logs", "description": "View system logs"},
+                    {"name": "backup", "description": "Manage backups"},
+                ]
+            )
+ main
 
         return commands
 
@@ -377,6 +423,7 @@ class VoiceEnabledTerminal:
 
         self.ui.print_message("Goodbye!", "info")
 
+
 def setup_initial_user() -> None:
     """Create initial admin user if no users exist"""
     security = SecurityManager()
@@ -389,10 +436,13 @@ def setup_initial_user() -> None:
         email = input("Email (optional): ")
 
         import getpass
+
         while True:
             password = getpass.getpass("Password: ")
             if len(password) < security.settings.get("min_password_length", 8):
-                print(f"Password must be at least {security.settings.get('min_password_length', 8)} characters.")
+                print(
+                    f"Password must be at least {security.settings.get('min_password_length', 8)} characters."
+                )
                 continue
 
             confirm = getpass.getpass("Confirm password: ")
@@ -409,10 +459,13 @@ def setup_initial_user() -> None:
         else:
             print("\n❌ Error creating admin account.")
 
+
 def main() -> None:
     """Main entry point"""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Triad Terminal - Voice-Enabled Development Environment")
+    parser = argparse.ArgumentParser(
+        description="Triad Terminal - Voice-Enabled Development Environment"
+    )
     parser.add_argument("--dev", action="store_true", help="Development mode (skip authentication)")
     parser.add_argument("--theme", type=str, default="matrix", help="UI theme")
     parser.add_argument("--setup", action="store_true", help="Set up initial user")
@@ -427,6 +480,7 @@ def main() -> None:
     # Create and launch the terminal
     terminal = VoiceEnabledTerminal(theme=args.theme)
     terminal.launch(skip_auth=args.dev, enable_voice=not args.no_voice)
+
 
 if __name__ == "__main__":
     try:

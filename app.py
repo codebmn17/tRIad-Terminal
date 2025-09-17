@@ -52,6 +52,7 @@ def predict_knn_endpoint(inp: FeaturesIn):
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
+
 @app.post("/predict/forest")
 def predict_forest_endpoint(inp: FeaturesIn):
     try:

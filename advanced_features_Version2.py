@@ -9,6 +9,7 @@ import datetime
 import json
 import logging
 import os
+import subprocess
 import sys
 import time
 from typing import Any
@@ -443,7 +444,10 @@ class DocumentationGenerator:
 
             # Check if sphinx is installed
             try:
-                import sphinx
+                import importlib.util
+
+                if importlib.util.find_spec("sphinx") is None:
+                    raise ImportError()
             except ImportError:
                 logger.warning("Sphinx not installed, attempting to install it")
                 subprocess.run([sys.executable, "-m", "pip", "install", "sphinx"], check=True)
@@ -544,7 +548,10 @@ class TestRunner:
 
             # Check if pytest is installed
             try:
-                import pytest
+                import importlib.util
+
+                if importlib.util.find_spec("pytest") is None:
+                    raise ImportError()
             except ImportError:
                 logger.warning("pytest not installed, attempting to install it")
                 subprocess.run([sys.executable, "-m", "pip", "install", "pytest"], check=True)

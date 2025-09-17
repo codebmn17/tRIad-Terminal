@@ -7,6 +7,8 @@ structure and endpoints. It includes health checks and ML prediction routes.
 
 from __future__ import annotations
 
+import contextlib
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -58,11 +60,11 @@ def create_app() -> FastAPI:
         app.include_router(datasets_router, prefix="/datasets", tags=["datasets"])
 
     # Mount static files
-    try:
-        app.mount("/static", StaticFiles(directory="static"), name="static")
-    except RuntimeError:
+    with contextlib.suppress(RuntimeError):
         # Static directory doesn't exist, ignore
-        pass
+copilot/fix-d608ea6d-8f6a-43ba-bcc1-6521e80b4c85
+        app.mount("/static", StaticFiles(directory="static"), name="static")
+        pass main
 
     # Add template serving route
     @app.get("/datasets")
@@ -89,7 +91,8 @@ if DATASETS_AVAILABLE:
         try:
             from triad_terminal.startup_datasets import initialize_dataset_system
 
-            await initialize_dataset_system()
+            await initialize_dataset_system()copilot/fix-d608ea6d-8f6a-43ba-bcc1-6521e80b4c85
+        except Exception as e:
         except Exception as e:  # noqa: BLE001
-            # Log and continue to avoid crashing the app on optional feature init
+            # Log and continue to avoid crashing the app on optional feature initmain
             print(f"Error initializing dataset system: {e}")
