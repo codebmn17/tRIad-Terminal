@@ -8,7 +8,11 @@ from .core import Agent
 
 def discover_builtin_agents() -> dict[str, type[Agent]]:
     """Discover available builtin agents."""
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    registry: Dict[str, Type[Agent]] = {}
+
     registry: dict[str, type[Agent]] = {}
+ main
 
     try:
         from .builtins.planner import PlannerAgent
@@ -29,7 +33,11 @@ def discover_builtin_agents() -> dict[str, type[Agent]]:
 
         registry["ExecutorAgent"] = ExecutorAgent
     except ImportError:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
+
         pass
+ main
 
     try:
     from .builtins.recorder import RecorderAgent

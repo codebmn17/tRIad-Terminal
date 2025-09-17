@@ -4,7 +4,19 @@
 Triad Terminal with Voice Integration
 Combines security, enhanced UI, and voice capabilities
 """
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+import pip install
+import pyttsx3
+import SpeechRecognition
+import pyaudio
+import gtts
+import playsound
+import os
+import sys
+import time
+
 # Dependencies will be handled by pip install -r requirements.txt
+ main
 import argparse
 import logging
 import os
@@ -42,9 +54,13 @@ class VoiceEnabledTerminal:
         self.voice_stop_event = None
         self.command_history = []
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def launch(self, skip_auth: bool = False, skip_intro: bool = False, enable_voice: bool = True) -> bool:
+
     def launch(
         self, skip_auth: bool = False, skip_intro: bool = False, enable_voice: bool = True
     ) -> bool:
+ main
         """Launch the terminal"""
         if not skip_intro:
             self.ui.clear_screen()
@@ -135,7 +151,11 @@ class VoiceEnabledTerminal:
             session_dir = os.path.expanduser("~/.triad/security")
             os.makedirs(session_dir, exist_ok=True)
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            with open(os.path.join(session_dir, "current_session"), 'w') as f:
+
             with open(os.path.join(session_dir, "current_session"), "w") as f:
+ main
                 f.write(self.session_id)
         except Exception as e:
             logger.error(f"Error saving session: {e}")
@@ -245,11 +265,16 @@ class VoiceEnabledTerminal:
         # Basic status items
         status_items = [
             {"name": "Terminal", "status": "Running", "details": "No issues detected"},
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            {"name": "Voice Assistant", "status": "Active" if self.voice_stop_event else "Inactive",
+             "details": "Listening for commands" if self.voice_stop_event else "Not enabled"},
+
             {
                 "name": "Voice Assistant",
                 "status": "Active" if self.voice_stop_event else "Inactive",
                 "details": "Listening for commands" if self.voice_stop_event else "Not enabled",
             },
+main
             {"name": "Network", "status": "Connected", "details": "Internet access available"},
             {"name": "Projects", "status": "3 Active", "details": "No issues detected"},
             {
@@ -334,7 +359,11 @@ class VoiceEnabledTerminal:
 
         return response
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _get_available_commands(self) -> List[Dict[str, str]]:
+
     def _get_available_commands(self) -> list[dict[str, str]]:
+ main
         """Get available commands for the current user"""
         # Basic commands available to all users
         commands = [
@@ -350,6 +379,14 @@ class VoiceEnabledTerminal:
         # Add admin commands if the user is an admin
         users = self.security._load_users()
         if self.username in users and users[self.username].get("admin", False):
+<<<< copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            commands.extend([
+                {"name": "users", "description": "User management"},
+                {"name": "config", "description": "System configuration"},
+                {"name": "logs", "description": "View system logs"},
+                {"name": "backup", "description": "Manage backups"}
+            ])
+
             commands.extend(
                 [
                     {"name": "users", "description": "User management"},
@@ -358,6 +395,7 @@ class VoiceEnabledTerminal:
                     {"name": "backup", "description": "Manage backups"},
                 ]
             )
+ main
 
         return commands
 

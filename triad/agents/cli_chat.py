@@ -46,8 +46,13 @@ class MessageDisplayAgent(Agent):
 
         # Get the role icon
         icon = ""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        if hasattr(msg, 'meta') and 'icon' in msg.meta:
+            icon = msg.meta['icon']
+
         if hasattr(msg, "meta") and "icon" in msg.meta:
             icon = msg.meta["icon"]
+ main
 
         # Format and display the message
         role_prefix = f"{icon} {msg.role}" if icon else msg.role
@@ -59,7 +64,11 @@ async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None
     router = Router()
 
     # Instantiate agents
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    agents: List[Agent] = [cls() for cls in agent_classes]
+
     agents: list[Agent] = [cls() for cls in agent_classes]
+ main
 
     # Add display agent to show responses
     display_agent = MessageDisplayAgent()
@@ -207,14 +216,17 @@ print(color("dim", "Type your message. Ctrl+C to exit."))
             user_text = user_text.strip("\n")
             if not user_text:
                 continue
-            
+
             print(f"{color('yellow', '[you]')}: {user_text}")
             await router.post(Message(room=room, sender="you", content=user_text, role="user"))
-            
+
             # Small delay to let agents respond
             await asyncio.sleep(0.1)
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
             
  main
+main
     except KeyboardInterrupt:
         print("\nbye")
     finally:

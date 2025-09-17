@@ -5,6 +5,9 @@ Triad Terminal Shell Interface
 Provides enhanced shell integration capabilities
 """
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+import contextlib
+ main
 import fcntl
 import logging
 import os
@@ -759,10 +762,9 @@ class InteractiveShell:
 
         # Kill any running process
         if self.current_process:
-            try:
+            with contextlib.suppress(Exception):
                 self.current_process.terminate()
-            except Exception:
-                pass
+
 
 
 class PseudoTerminal:
@@ -851,10 +853,8 @@ class PseudoTerminal:
     def _cleanup(self) -> None:
         """Clean up resources"""
         if self.fd:
-            try:
+            with contextlib.suppress(OSError):
                 os.close(self.fd)
-            except OSError:
-                pass
             self.fd = None
 
         self.running = False

@@ -7,7 +7,9 @@ Provides text-to-speech and speech recognition capabilities
 
 from __future__ import annotations
 
-import array
+import array copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+import contextlib
+ main
 import json
 import logging
 import math
@@ -145,10 +147,8 @@ class VoiceManager:
                         playsound.playsound(temp_file, True)
 
                         # Clean up
-                        try:
+                        with contextlib.suppress(Exception):
                             os.remove(temp_file)
-                        except Exception:
-                            pass
                     except Exception as e:
                         logger.error(f"TTS (gTTS) error: {e}")
 

@@ -46,7 +46,11 @@ def log_with_context(level: str, message: str, component: str, event: str, **kwa
     """
     Structured logging helper with context information.
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
  copilot/fix-c1e50cd2-35ad-4991-8bc0-a59778375133
+ main
 
     Args:
         level: log level
@@ -65,7 +69,11 @@ def log_with_context(level: str, message: str, component: str, event: str, **kwa
         ...
     """
     # function body...
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+     main
+
     
+ main
  main
     Args:
         level: Log level (info, warning, error, debug)
@@ -74,7 +82,14 @@ def log_with_context(level: str, message: str, component: str, event: str, **kwa
         event: Event type (e.g., 'prediction', 'training', 'initialization')
         **kwargs: Additional context data
     """
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    context = {
+        "component": component,
+        "event": event,
+        **kwargs
+    }
     context = {"component": component, "event": event, **kwargs}
+ main
 
     log_message = f"[{component}:{event}] {message}"
     if context:
@@ -110,12 +125,17 @@ class CodeCompletionEngine:
     def _load_models(self) -> None:
         """Load trained models if available"""
         if not HAS_SKLEARN:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            log_with_context("warning", "scikit-learn not available, code completion will be limited",
+                            "code_engine", "initialization")
+
             log_with_context(
                 "warning",
                 "scikit-learn not available, code completion will be limited",
                 "code_engine",
                 "initialization",
             )
+ main
             return
 
         for language in self.supported_languages:
@@ -124,6 +144,13 @@ class CodeCompletionEngine:
             if os.path.exists(vectorizer_path):
                 try:
                     self.vectorizers[language] = joblib.load(vectorizer_path)
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                    log_with_context("info", f"Loaded vectorizer for {language}",
+                                    "code_engine", "initialization", language=language)
+                except Exception as e:
+                    log_with_context("error", f"Failed to load vectorizer for {language}",
+                                    "code_engine", "initialization", language=language, error=str(e))
+
                     log_with_context(
                         "info",
                         f"Loaded vectorizer for {language}",
@@ -140,6 +167,7 @@ class CodeCompletionEngine:
                         language=language,
                         error=str(e),
                     )
+ main
 
             # Load simple completion model
             model_path = os.path.join(self.model_dir, f"{language}_completion_model.pkl")
@@ -251,7 +279,11 @@ class CodeCompletionEngine:
                     continue
 
                 # Create and train TF-IDF vectorizer
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                vectorizer = TfidfVectorizer(analyzer='word', ngram_range=(1, 3),
+                                           max_features=5000)
                 vectorizer = TfidfVectorizer(analyzer="word", ngram_range=(1, 3), max_features=5000)
+ main
                 X = vectorizer.fit_transform(token_sequences)
                 y = next_tokens
 
@@ -283,7 +315,11 @@ class CodeCompletionEngine:
             logger.error(f"Error during model training: {e}")
             return False
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _train_neural_model(self, language: str, samples: List[str]) -> None:
+
     def _train_neural_model(self, language: str, samples: list[str]) -> None:
+ main
         """Train a neural model for more complex completions"""
         if not HAS_TENSORFLOW:
             return
@@ -317,7 +353,11 @@ class CodeCompletionEngine:
 
         # Pad sequences
         max_sequence_len = max([len(x) for x in input_sequences])
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        input_sequences = pad_sequences(input_sequences, maxlen=max_sequence_len, padding='pre')
+
         input_sequences = pad_sequences(input_sequences, maxlen=max_sequence_len, padding="pre")
+ main
 
         # Create training data
         X = input_sequences[:, :-1]
@@ -332,8 +372,14 @@ class CodeCompletionEngine:
         model.add(LSTM(150, return_sequences=True))
         model.add(Dropout(0.2))
         model.add(LSTM(100))
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        model.add(Dense(total_words, activation='softmax'))
+
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
         model.add(Dense(total_words, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+ main
         model.fit(X, y, epochs=30, verbose=0)
 
         # Save model and tokenizer
@@ -349,9 +395,13 @@ class CodeCompletionEngine:
 
         logger.info(f"Neural model for {language} trained and saved")
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def get_completion(self, code_context: str, language: str, max_suggestions: int = 3) -> List[str]:
+
     def get_completion(
         self, code_context: str, language: str, max_suggestions: int = 3
     ) -> list[str]:
+ main
         """Get code completion suggestions based on context"""
         if not self.ready or language not in self.supported_languages:
             # Return static suggestions if models aren't ready
@@ -390,7 +440,10 @@ class CodeCompletionEngine:
         # Fall back to static suggestions
         return self._get_static_suggestions(code_context, language)
 
-    def _get_simple_suggestions(self, code_context: str, language: str) -> list[str]:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _get_simple_suggestions(self, code_context: str, language: str) -> List[str]:
+
+    def _get_simple_suggestions(self, code_context: str, language: str) -> list[str]: main
         """Get suggestions using the simple ML model"""
         # Get the most recent tokens
         tokens = self._tokenize_code(code_context, language)
@@ -418,7 +471,11 @@ class CodeCompletionEngine:
 
         return next_tokens
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _get_neural_suggestions(self, code_context: str, language: str) -> List[str]:
+
     def _get_neural_suggestions(self, code_context: str, language: str) -> list[str]:
+ main
         """Get suggestions using the neural model"""
         if not HAS_TENSORFLOW:
             return []
@@ -437,7 +494,9 @@ class CodeCompletionEngine:
         token_list = token_list[-expected_length:]
 
         # Pad sequence
-        token_list = pad_sequences([token_list], maxlen=expected_length, padding="pre")
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        token_list = pad_sequences([token_list], maxlen=expected_length, padding='pre')
+        token_list = pad_sequences([token_list], maxlen=expected_length, padding="pre") main
 
         # Predict next token
         predicted = model.predict(token_list, verbose=0)
@@ -456,7 +515,11 @@ class CodeCompletionEngine:
 
         return suggestions
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _get_static_suggestions(self, code_context: str, language: str) -> List[str]:
+
     def _get_static_suggestions(self, code_context: str, language: str) -> list[str]:
+ main
         """Get static code suggestions based on language and context"""
         # Simplified language-specific suggestions
         context_lower = code_context.lower()
@@ -502,7 +565,9 @@ class CodeCompletionEngine:
         # Generic suggestions
         return ["()", "{}", "[]", "="]
 
-    def _tokenize_code(self, code: str, language: str) -> list[str]:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _tokenize_code(self, code: str, language: str) -> List[str]:
+    def _tokenize_code(self, code: str, language: str) -> list[str]: main
         """Tokenize code based on language"""
         # Simple tokenization for different languages
         if language == "python" or language == "bash":
@@ -516,7 +581,10 @@ class CodeCompletionEngine:
             tokens = re.findall(r"\b\w+\b|[^\w\s]", code.lower())
         else:
             # Generic tokenization
-            tokens = re.findall(r"\b\w+\b|[^\w\s]", code)
+<copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            tokens = re.findall(r'\b\w+\b|[^\w\s]', code)
+=
+            tokens = re.findall(r"\b\w+\b|[^\w\s]", code) main
 
         return tokens
 
@@ -532,8 +600,13 @@ class CommandPredictor:
         # Command history data
         self.commands = []
         self.command_frequencies = {}  # How often a command is used
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        self.command_sequences = {}    # What commands follow others
+        self.command_contexts = {}     # In what contexts commands are used
+
         self.command_sequences = {}  # What commands follow others
         self.command_contexts = {}  # In what contexts commands are used
+ main
 
         # Load command history
         self._load_history()
@@ -556,6 +629,13 @@ class CommandPredictor:
                 self.command_sequences = data.get("sequences", {})
                 self.command_contexts = data.get("contexts", {})
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                log_with_context("info", f"Loaded {len(self.commands)} commands from history",
+                                "predictor", "initialization", commands_count=len(self.commands))
+
+            except Exception as e:
+                log_with_context("error", "Error loading command history",
+                                "predictor", "initialization", error=str(e))
                 log_with_context(
                     "info",
                     f"Loaded {len(self.commands)} commands from history",
@@ -572,6 +652,7 @@ class CommandPredictor:
                     "initialization",
                     error=str(e),
                 )
+ main
                 self._initialize_empty_history()
         else:
             self._initialize_empty_history()
@@ -608,7 +689,11 @@ class CommandPredictor:
 
         try:
             # Create vectorizer and training data
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            self.vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(2, 5))
+
             self.vectorizer = TfidfVectorizer(analyzer="char", ngram_range=(2, 5))
+main
 
             # Extract unique commands
             unique_commands = list(set(self.commands))
@@ -647,9 +732,13 @@ class CommandPredictor:
             if prev_cmd not in self.command_sequences:
                 self.command_sequences[prev_cmd] = {}
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            self.command_sequences[prev_cmd][command] = self.command_sequences[prev_cmd].get(command, 0) + 1
+
             self.command_sequences[prev_cmd][command] = (
                 self.command_sequences[prev_cmd].get(command, 0) + 1
             )
+ main
 
         # Update context information
         if context:
@@ -658,9 +747,13 @@ class CommandPredictor:
 
             for ctx in context.split():
                 if ctx:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                    self.command_contexts[command][ctx] = self.command_contexts[command].get(ctx, 0) + 1
+
                     self.command_contexts[command][ctx] = (
                         self.command_contexts[command].get(ctx, 0) + 1
                     )
+main
 
         # Save history periodically
         if len(self.commands) % 10 == 0:
@@ -670,9 +763,11 @@ class CommandPredictor:
         if HAS_SKLEARN and self.model is None and len(self.commands) >= 10:
             self._initialize_model()
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def predict_next_command(self, prefix: str = "", context: str = None, max_suggestions: int = 5) -> List[str]:
     def predict_next_command(
         self, prefix: str = "", context: str = None, max_suggestions: int = 5
-    ) -> list[str]:
+    ) -> list[str]: main
         """Predict next command based on prefix and context"""
         suggestions = []
 
@@ -722,7 +817,15 @@ class CommandPredictor:
                 seq_commands = self.command_sequences[last_cmd]
 
                 # Sort by frequency
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                seq_suggestions = sorted(
+                    seq_commands.items(),
+                    key=lambda x: x[1],
+                    reverse=True
+                )
+
                 seq_suggestions = sorted(seq_commands.items(), key=lambda x: x[1], reverse=True)
+ main
 
                 for cmd, _ in seq_suggestions:
                     if cmd not in suggestions and (not prefix or cmd.startswith(prefix)):
@@ -775,7 +878,11 @@ class CommandPredictor:
 
         return suggestions[:max_suggestions]
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def train(self, force: bool = False) -> Dict[str, Any]:
+
     def train(self, force: bool = False) -> dict[str, Any]:
+ main
         """
         Train the command prediction model.
 
@@ -795,6 +902,9 @@ class CommandPredictor:
             "model_trained": self.model is not None,
         }
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        log_with_context("info", "Starting command predictor training", "predictor", "training",
+                        force=force, commands_count=before_stats["commands_count"])
         log_with_context(
             "info",
             "Starting command predictor training",
@@ -803,6 +913,7 @@ class CommandPredictor:
             force=force,
             commands_count=before_stats["commands_count"],
         )
+ main
 
         try:
             # Check if we have enough data
@@ -841,6 +952,11 @@ class CommandPredictor:
 
             training_time_ms = (time.time() - start_time) * 1000
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            log_with_context("info", "Command predictor training completed", "predictor", "training",
+                            training_time_ms=training_time_ms,
+                            unique_commands=after_stats["unique_commands"])
+
             log_with_context(
                 "info",
                 "Command predictor training completed",
@@ -849,6 +965,7 @@ class CommandPredictor:
                 training_time_ms=training_time_ms,
                 unique_commands=after_stats["unique_commands"],
             )
+ main
 
             return {
                 "success": True,
@@ -1081,7 +1198,11 @@ class NaturalLanguageProcessor:
         except Exception as e:
             logger.error(f"Error initializing NL models: {e}")
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def process_command(self, nl_command: str) -> Dict[str, Any]:
+
     def process_command(self, nl_command: str) -> dict[str, Any]:
+ main
         """Process a natural language command"""
         result = {
             "success": False,
@@ -1136,7 +1257,11 @@ class NaturalLanguageProcessor:
 
         return result
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _detect_intent(self, nl_command: str) -> Tuple[Optional[str], float]:
+
     def _detect_intent(self, nl_command: str) -> tuple[str | None, float]:
+ main
         """Detect intent from natural language command"""
         # Try ML-based classification if available
         if HAS_SKLEARN and self.classifier and self.vectorizer:
@@ -1177,13 +1302,21 @@ class NaturalLanguageProcessor:
 
         return best_intent, best_score
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _extract_entities(self, nl_command: str, intent: str) -> Dict[str, str]:
+
     def _extract_entities(self, nl_command: str, intent: str) -> dict[str, str]:
+ main
         """Extract entities from command based on intent"""
         entities = {}
 
         # Get entities needed for this intent
         template = self.command_templates.get(intent, "")
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        required_entities = re.findall(r'{(\w+)}', template)
+
         required_entities = re.findall(r"{(\w+)}", template)
+ main
 
         # Extract each entity
         for entity in required_entities:
@@ -1275,16 +1408,32 @@ class AIAssistant:
 
         # Initialize components
         self.code_engine = CodeCompletionEngine(os.path.join(self.data_dir, "models"))
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        self.command_predictor = CommandPredictor(os.path.join(self.data_dir, "history/commands.json"))
+        self.nl_processor = NaturalLanguageProcessor(os.path.join(self.data_dir, "nl_training.json"))
+
         self.command_predictor = CommandPredictor(
             os.path.join(self.data_dir, "history/commands.json")
         )
         self.nl_processor = NaturalLanguageProcessor(
             os.path.join(self.data_dir, "nl_training.json")
         )
+ main
 
         # State tracking
         self.current_context = ""
         self.last_command = ""
+
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def complete_code(self, code_context: str, language: str) -> List[str]:
+        """Get code completion suggestions"""
+        return self.code_engine.get_completion(code_context, language)
+
+    def predict_command(self, prefix: str = "") -> List[str]:
+        """Predict next command based on prefix and history"""
+        return self.command_predictor.predict_next_command(prefix, context=self.current_context)
+
+    def process_nl_command(self, nl_command: str) -> Dict[str, Any]:
 
     def complete_code(self, code_context: str, language: str) -> list[str]:
         """Get code completion suggestions"""
@@ -1295,6 +1444,7 @@ class AIAssistant:
         return self.command_predictor.predict_next_command(prefix, context=self.current_context)
 
     def process_nl_command(self, nl_command: str) -> dict[str, Any]:
+ main
         """Process natural language command"""
         return self.nl_processor.process_command(nl_command)
 
@@ -1320,7 +1470,11 @@ class AIAssistant:
         if intent:
             self.nl_processor.add_training_example(nl_command, intent, executed_command)
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _guess_intent(self, command: str) -> Optional[str]:
+
     def _guess_intent(self, command: str) -> str | None:
+ main
         """Guess intent from executed command with enhanced pattern recognition"""
         if not command:
             return None
@@ -1331,6 +1485,50 @@ class AIAssistant:
         # Enhanced command to intent mapping
         command_intent_map = {
             # File operations
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            "ls": "list_files", "ll": "list_files", "dir": "list_files",
+            "find": "find_files", "locate": "find_files", "which": "find_files",
+            "mkdir": "create_directory", "md": "create_directory",
+            "rm": "remove_file", "rmdir": "remove_file", "del": "remove_file",
+            "cat": "show_file", "less": "show_file", "more": "show_file", "head": "show_file", "tail": "show_file",
+            "nano": "edit_file", "vim": "edit_file", "vi": "edit_file", "emacs": "edit_file", "code": "edit_file",
+            "cp": "copy_file", "copy": "copy_file", "mv": "move_file", "move": "move_file",
+            "chmod": "change_permissions", "chown": "change_ownership",
+
+            # Git commands
+            "git": "git_operation",
+
+            # Package managers
+            "pip": "package_management", "pip3": "package_management",
+            "npm": "package_management", "yarn": "package_management",
+            "apt": "package_management", "apt-get": "package_management",
+            "yum": "package_management", "dnf": "package_management",
+            "brew": "package_management", "conda": "package_management",
+
+            # System monitoring
+            "ps": "process_status", "top": "process_status", "htop": "process_status",
+            "df": "disk_usage", "du": "disk_usage", "lsblk": "disk_usage",
+            "free": "memory_usage", "vmstat": "memory_usage",
+            "netstat": "network_status", "ss": "network_status", "lsof": "network_status",
+            "systemctl": "service_management", "service": "service_management",
+            "crontab": "scheduling", "at": "scheduling",
+
+            # Network diagnostics
+            "ping": "network_diagnostic", "curl": "network_diagnostic", "wget": "network_diagnostic",
+            "ssh": "remote_connection", "scp": "file_transfer", "rsync": "file_transfer",
+            "telnet": "network_diagnostic", "nslookup": "network_diagnostic", "dig": "network_diagnostic",
+
+            # Archive/compression
+            "tar": "archive_operation", "zip": "compress", "unzip": "extract",
+            "gzip": "compress", "gunzip": "extract", "bzip2": "compress", "bunzip2": "extract",
+
+            # Python tooling
+            "python": "python_execution", "python3": "python_execution", "py": "python_execution",
+            "pytest": "testing", "unittest": "testing", "coverage": "testing",
+            "black": "code_formatting", "flake8": "code_analysis", "pylint": "code_analysis",
+            "mypy": "type_checking", "isort": "import_sorting",
+
+
             "ls": "list_files",
             "ll": "list_files",
             "dir": "list_files",
@@ -1416,7 +1614,7 @@ class AIAssistant:
             "flake8": "code_analysis",
             "pylint": "code_analysis",
             "mypy": "type_checking",
-            "isort": "import_sorting",
+            "isort": "import_sorting", main
             # Development tools
             "make": "build_system",
             "cmake": "build_system",
@@ -1438,6 +1636,10 @@ class AIAssistant:
         if intent:
             return intent
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        log_with_context("debug", f"No intent found for command", "assistant", "intent_detection",
+                        command=command_start)
+
         log_with_context(
             "debug",
             "No intent found for command",
@@ -1445,6 +1647,7 @@ class AIAssistant:
             "intent_detection",
             command=command_start,
         )
+ main
         return None
 
     def _refine_intent_with_patterns(self, base_intent: str, command: str) -> str:
@@ -1486,7 +1689,11 @@ class AIAssistant:
 
         return base_intent
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _guess_intent_from_patterns(self, command: str) -> Optional[str]:
+
     def _guess_intent_from_patterns(self, command: str) -> str | None:
+ main
         """Guess intent from command patterns and content"""
 
         # File extension patterns
@@ -1512,7 +1719,10 @@ class AIAssistant:
 
         return None
 
-    def train_models(self, force: bool = False, components: list[str] = ["all"]) -> dict[str, Any]:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def train_models(self, force: bool = False, components: List[str] = ["all"]) -> Dict[str, Any]:
+
+    def train_models(self, force: bool = False, components: list[str] = ["all"]) -> dict[str, Any]: main
         """
         Train all models with enhanced capabilities.
 
@@ -1540,6 +1750,9 @@ class AIAssistant:
             "commands": train_all or "commands" in components,
             "nl": train_all or "nl" in components,
         }
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        log_with_context("info", "Starting model training", "assistant", "training",
+                        components=components, force=force)
 
         log_with_context(
             "info",
@@ -1549,6 +1762,7 @@ class AIAssistant:
             components=components,
             force=force,
         )
+ main
 
         # Collect before stats
         results["before_stats"] = self.status()
@@ -1578,12 +1792,17 @@ class AIAssistant:
                             "info", "Command predictor training completed", "assistant", "training"
                         )
                     else:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                        log_with_context("warning", f"Command predictor training failed: {cmd_result['message']}",
+                                        "assistant", "training")
+
                         log_with_context(
                             "warning",
                             f"Command predictor training failed: {cmd_result['message']}",
                             "assistant",
                             "training",
                         )
+ main
                         if "insufficient" in cmd_result["message"].lower():
                             # Not a real failure, just insufficient data
                             pass
@@ -1620,6 +1839,13 @@ class AIAssistant:
         results["training_time_ms"] = (time.time() - start_time) * 1000
 
         if results["success"]:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            results["message"] = f"Training completed successfully for components: {', '.join(results['components_trained'])}"
+
+        return results
+
+    def status(self) -> Dict[str, Any]:
+
             results["message"] = (
                 f"Training completed successfully for components: {', '.join(results['components_trained'])}"
             )
@@ -1627,6 +1853,7 @@ class AIAssistant:
         return results
 
     def status(self) -> dict[str, Any]:
+ main
         """
         Get comprehensive status of the AI assistant.
 
@@ -1723,10 +1950,13 @@ def main() -> None:
 
     print("\nAI Assistant test complete")
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
 
 if __name__ == "__main__":
     print(
         """
+ main
 This file has been renamed to assistant_ml.py to follow Python naming conventions.
 Please update your imports to use 'assistant_ml' instead of 'assistant-ML'.
 """

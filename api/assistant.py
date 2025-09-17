@@ -100,7 +100,11 @@ def get_assistant_engine():
 
         return CodeCompletionEngine()
     except ImportError as e:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        raise HTTPException(status_code=503, detail=f"Assistant not available: {str(e)}") from e
+
         raise HTTPException(status_code=503, detail=f"Assistant not available: {str(e)}")
+ main
 
 
 def heuristic_command_prediction(context: str, history: list[str]) -> list[str]:
@@ -194,9 +198,15 @@ async def assistant_status() -> AssistantStatusResponse:
         # Check if sklearn is available
         sklearn_available = False
         try:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            import importlib.util
+
+            sklearn_available = importlib.util.find_spec("sklearn") is not None
+
             import sklearn
 
             sklearn_available = True
+ main
         except ImportError:
             pass
 
@@ -209,7 +219,11 @@ async def assistant_status() -> AssistantStatusResponse:
             supported_languages = getattr(
                 engine, "supported_languages", ["python", "javascript", "bash"]
             )
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        except Exception:
+
         except:
+ main
             available = False
             models_trained = False
             supported_languages = ["python", "javascript", "bash"]  # Default fallback
@@ -372,4 +386,8 @@ async def provide_feedback(request: FeedbackRequest) -> dict[str, str]:
             "note": "Feedback will be used to improve future suggestions",
         }
     except Exception as e:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        raise HTTPException(status_code=500, detail=f"Error processing feedback: {str(e)}") from e
+
         raise HTTPException(status_code=500, detail=f"Error processing feedback: {str(e)}")
+ main

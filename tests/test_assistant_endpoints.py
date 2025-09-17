@@ -148,7 +148,17 @@ class TestAssistantEndpoints:
 
     def test_train_assistant_force(self):
         """Test training endpoint with force flag."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        response = client.post(
+            "/assistant/train",
+            json={
+                "force": True,
+                "components": ["all"]
+            }
+        )
+
         response = client.post("/assistant/train", json={"force": True, "components": ["all"]})
+ main
 
         assert response.status_code in [200, 503]
 
@@ -186,10 +196,15 @@ class TestAssistantEndpoints:
         # Check that key schemas are present
         schemas = data["schemas"]
         expected_schemas = [
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            "AssistantStatus", "PredictCommandResponse",
+            "NLResponse", "TrainResponse"
+
             "AssistantStatus",
             "PredictCommandResponse",
             "NLResponse",
             "TrainResponse",
+ main
         ]
 
         for schema_name in expected_schemas:
@@ -241,7 +256,14 @@ class TestAssistantSchemaValidation:
 
     def test_nl_response_schema(self):
         """Test that NL response matches schema."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        response = client.post(
+            "/assistant/process_nl",
+            json={"nl_command": "list files"}
+        )
+
         response = client.post("/assistant/process_nl", json={"nl_command": "list files"})
+ main
 
         if response.status_code == 200:
             data = response.json()
@@ -265,12 +287,17 @@ class TestAssistantSchemaValidation:
 
             # Required fields
             required_fields = [
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+                "success", "message", "components_trained",
+                "before_stats", "after_stats", "training_time_ms"
+
                 "success",
                 "message",
                 "components_trained",
                 "before_stats",
                 "after_stats",
                 "training_time_ms",
+ main
             ]
 
             for field in required_fields:
@@ -317,10 +344,15 @@ class TestAssistantStatusEndpoint:
         # Check features
         features = data["features"]
         expected_features = [
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            "command_prediction", "code_completion",
+            "natural_language", "machine_learning"
+
             "command_prediction",
             "code_completion",
             "natural_language",
             "machine_learning",
+ main
         ]
         for feature in expected_features:
             assert feature in features
@@ -337,7 +369,15 @@ class TestCommandPredictionEndpoint:
 
     def test_predict_command_basic(self):
         """Test basic command prediction."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "context": "ls",
+            "history": [],
+            "max_suggestions": 5
+        }
+
         request_data = {"context": "ls", "history": [], "max_suggestions": 5}
+ main
 
         response = client.post("/assistant/predict_command", json=request_data)
         assert response.status_code == 200
@@ -374,7 +414,14 @@ class TestCommandPredictionEndpoint:
 
     def test_predict_command_empty_context(self):
         """Test command prediction with empty context."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "context": "",
+            "history": []
+        }
+
         request_data = {"context": "", "history": []}
+ main
 
         response = client.post("/assistant/predict_command", json=request_data)
         assert response.status_code == 200
@@ -385,7 +432,14 @@ class TestCommandPredictionEndpoint:
 
     def test_predict_command_max_suggestions(self):
         """Test that max_suggestions parameter is respected."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "context": "git",
+            "max_suggestions": 2
+        }
+
         request_data = {"context": "git", "max_suggestions": 2}
+ main
 
         response = client.post("/assistant/predict_command", json=request_data)
         assert response.status_code == 200
@@ -399,7 +453,15 @@ class TestCodeCompletionEndpoint:
 
     def test_complete_code_python(self):
         """Test Python code completion."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "code": "def hello_world():",
+            "language": "python",
+            "max_completions": 5
+        }
+
         request_data = {"code": "def hello_world():", "language": "python", "max_completions": 5}
+ main
 
         response = client.post("/assistant/complete_code", json=request_data)
         assert response.status_code == 200
@@ -421,7 +483,14 @@ class TestCodeCompletionEndpoint:
 
     def test_complete_code_javascript(self):
         """Test JavaScript code completion."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "code": "function test() {",
+            "language": "javascript"
+        }
+
         request_data = {"code": "function test() {", "language": "javascript"}
+ main
 
         response = client.post("/assistant/complete_code", json=request_data)
         assert response.status_code == 200
@@ -431,7 +500,14 @@ class TestCodeCompletionEndpoint:
 
     def test_complete_code_bash(self):
         """Test Bash code completion."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "code": "#!/bin/bash\necho",
+            "language": "bash"
+        }
+
         request_data = {"code": "#!/bin/bash\necho", "language": "bash"}
+ main
 
         response = client.post("/assistant/complete_code", json=request_data)
         assert response.status_code == 200
@@ -441,7 +517,14 @@ class TestCodeCompletionEndpoint:
 
     def test_complete_code_empty(self):
         """Test code completion with empty code."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "code": "",
+            "language": "python"
+        }
+
         request_data = {"code": "", "language": "python"}
+ main
 
         response = client.post("/assistant/complete_code", json=request_data)
         assert response.status_code == 200
@@ -452,7 +535,15 @@ class TestCodeCompletionEndpoint:
 
     def test_complete_code_max_completions(self):
         """Test that max_completions parameter is respected."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "code": "import",
+            "language": "python",
+            "max_completions": 3
+        }
+
         request_data = {"code": "import", "language": "python", "max_completions": 3}
+ main
 
         response = client.post("/assistant/complete_code", json=request_data)
         assert response.status_code == 200
@@ -466,7 +557,14 @@ class TestNaturalLanguageEndpoint:
 
     def test_nl_intent_recognition(self):
         """Test intent recognition."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "text": "How do I create a new file?",
+            "task": "intent"
+        }
+
         request_data = {"text": "How do I create a new file?", "task": "intent"}
+ main
 
         response = client.post("/assistant/nl", json=request_data)
         assert response.status_code == 200
@@ -482,7 +580,14 @@ class TestNaturalLanguageEndpoint:
 
     def test_nl_command_translation(self):
         """Test command translation."""
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "text": "list files in current directory",
+            "task": "command"
+        }
+
         request_data = {"text": "list files in current directory", "task": "command"}
+ main
 
         response = client.post("/assistant/nl", json=request_data)
         assert response.status_code == 200
@@ -496,7 +601,14 @@ class TestNaturalLanguageEndpoint:
 
     def test_nl_creation_intent(self):
         """Test creation intent recognition."""
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "text": "I want to create a new directory",
+            "task": "intent"
+        }
+
         request_data = {"text": "I want to create a new directory", "task": "intent"}
+ main
 
         response = client.post("/assistant/nl", json=request_data)
         assert response.status_code == 200
@@ -506,7 +618,14 @@ class TestNaturalLanguageEndpoint:
 
     def test_nl_deletion_intent(self):
         """Test deletion intent recognition."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "text": "Remove this file please",
+            "task": "intent"
+        }
+
         request_data = {"text": "Remove this file please", "task": "intent"}
+ main
 
         response = client.post("/assistant/nl", json=request_data)
         assert response.status_code == 200
@@ -516,7 +635,14 @@ class TestNaturalLanguageEndpoint:
 
     def test_nl_unsupported_task(self):
         """Test handling of unsupported task."""
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "text": "Hello world",
+            "task": "unsupported_task"
+        }
+
         request_data = {"text": "Hello world", "task": "unsupported_task"}
+ main
 
         response = client.post("/assistant/nl", json=request_data)
         assert response.status_code == 200
@@ -527,7 +653,14 @@ class TestNaturalLanguageEndpoint:
 
     def test_nl_unknown_command(self):
         """Test handling of unknown command translation."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "text": "do something completely unknown",
+            "task": "command"
+        }
+
         request_data = {"text": "do something completely unknown", "task": "command"}
+ main
 
         response = client.post("/assistant/nl", json=request_data)
         assert response.status_code == 200
@@ -542,7 +675,14 @@ class TestFeedbackEndpoint:
 
     def test_provide_positive_feedback(self):
         """Test providing positive feedback."""
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        request_data = {
+            "feedback_type": "positive",
+            "context": "Command prediction was helpful"
+        }
+
         request_data = {"feedback_type": "positive", "context": "Command prediction was helpful"}
+ main
 
         response = client.post("/assistant/feedback", json=request_data)
         assert response.status_code == 200
@@ -594,7 +734,14 @@ class TestAssistantEndpointIntegration:
     def test_workflow_command_prediction_to_feedback(self):
         """Test complete workflow from prediction to feedback."""
         # 1. Get command prediction
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        predict_request = {
+            "context": "git",
+            "max_suggestions": 3
+        }
+
         predict_request = {"context": "git", "max_suggestions": 3}
+ main
 
         predict_response = client.post("/assistant/predict_command", json=predict_request)
         assert predict_response.status_code == 200
@@ -605,7 +752,12 @@ class TestAssistantEndpointIntegration:
         # 2. Provide feedback on the prediction
         feedback_request = {
             "feedback_type": "positive",
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            "context": f"Suggestion '{suggestions[0]}' was helpful"
+        }
+
             "context": f"Suggestion '{suggestions[0]}' was helpful",
+ main
 
         feedback_response = client.post("/assistant/feedback", json=feedback_request)
         assert feedback_response.status_code == 200
@@ -616,7 +768,14 @@ class TestAssistantEndpointIntegration:
     def test_code_completion_workflow(self):
         """Test code completion workflow."""
         # Get code completion
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        completion_request = {
+            "code": "def calculate_",
+            "language": "python"
+        }
+
         completion_request = {"code": "def calculate_", "language": "python"}
+ main
 
         response = client.post("/assistant/complete_code", json=completion_request)
         assert response.status_code == 200
@@ -628,7 +787,14 @@ class TestAssistantEndpointIntegration:
     def test_natural_language_workflow(self):
         """Test natural language processing workflow."""
         # Process natural language for intent
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        nl_request = {
+            "text": "Help me understand git commands",
+            "task": "intent"
+        }
+
         nl_request = {"text": "Help me understand git commands", "task": "intent"}
+ main
 
         response = client.post("/assistant/nl", json=nl_request)
         assert response.status_code == 200
@@ -637,7 +803,13 @@ class TestAssistantEndpointIntegration:
         assert data["result"] == "help_request"
 
         # Process for command translation
-        command_request = {"text": "show current directory", "task": "command"}
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        command_request = {
+            "text": "show current directory",
+            "task": "command"
+        }
+
+        command_request = {"text": "show current directory", "task": "command"} main
 
         response = client.post("/assistant/nl", json=command_request)
         assert response.status_code == 200

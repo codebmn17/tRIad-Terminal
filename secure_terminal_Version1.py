@@ -116,7 +116,11 @@ class SecureTerminal:
             session_dir = os.path.expanduser("~/.triad/security")
             os.makedirs(session_dir, exist_ok=True)
 
+copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            with open(os.path.join(session_dir, "current_session"), 'w') as f:
+
             with open(os.path.join(session_dir, "current_session"), "w") as f:
+ main
                 f.write(self.session_id)
         except Exception as e:
             logger.error(f"Error saving session: {e}")
@@ -143,7 +147,11 @@ class SecureTerminal:
         # For demonstration purposes, we'll just return success
         return True
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    def _get_available_commands(self) -> List[Dict[str, str]]:
+
     def _get_available_commands(self) -> list[dict[str, str]]:
+ main
         """Get available commands for the current user"""
         # Basic commands available to all users
         commands = [
@@ -169,6 +177,8 @@ class SecureTerminal:
             commands.extend([
                 {"name": "users", "description": "User management"},
                 {"name
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
                  commands.extend([
     {
         "name": "users",

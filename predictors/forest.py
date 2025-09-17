@@ -53,7 +53,11 @@ def _load_or_train_model() -> RandomForestClassifier:
 
 
 def _validate_x(x: list[float]) -> list[float]:
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+    if not isinstance(x, list | tuple):
+
     if not isinstance(x, (list, tuple)):
+ main
         raise ValueError("x must be a list of 4 numeric values.")
     if len(x) != 4:
         raise ValueError(
@@ -62,7 +66,7 @@ def _validate_x(x: list[float]) -> list[float]:
     try:
         floats = [float(v) for v in x]
     except Exception as e:
-        raise ValueError(f"x must be numeric: {e}")
+        raise ValueError(f"x must be numeric: {e}") from e
     return floats
 
 

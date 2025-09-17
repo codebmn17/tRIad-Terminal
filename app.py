@@ -49,7 +49,8 @@ def predict_knn_endpoint(inp: FeaturesIn):
     try:
         return predict_knn(inp.features)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
 
 
 @app.post("/predict/forest")
@@ -57,4 +58,4 @@ def predict_forest_endpoint(inp: FeaturesIn):
     try:
         return predict_forest(inp.features)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e

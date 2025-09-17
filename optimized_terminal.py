@@ -185,6 +185,15 @@ class TerminalUI:
             user = self.config.get("user", {}).get("name", "user")
             status_line = f"{now} | User: {user}"
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            self.console.print(Panel(
+                f"{self.get_logo()}\n\n{status_line}",
+                border_style=self.current_theme["header"],
+                box=box.DOUBLE,
+                expand=False,
+                padding=(1, 2)
+            ))
+=
             self.console.print(
                 Panel(
                     f"{self.get_logo()}\n\n{status_line}",
@@ -194,6 +203,7 @@ class TerminalUI:
                     padding=(1, 2),
                 )
             )
+>main
         else:
             # Fallback to simpler header
             from termcolor import colored
@@ -203,6 +213,12 @@ class TerminalUI:
             # Title centered
             title = "TRIAD TERMINAL"
             padding = (self.term_width - len(title) - 2) // 2
+< copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            print(colored("║", self.current_theme["header"]) + " " * padding +
+                  colored(title, self.current_theme["accent"], attrs=["bold"]) +
+                  " " * (self.term_width - len(title) - 2 - padding) +
+                  colored("║", self.current_theme["header"]))
+
             print(
                 colored("║", self.current_theme["header"])
                 + " " * padding
@@ -210,12 +226,19 @@ class TerminalUI:
                 + " " * (self.term_width - len(title) - 2 - padding)
                 + colored("║", self.current_theme["header"])
             )
+ main
 
             # Current date/time and user
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             user = self.config.get("user", {}).get("name", "user")
             status_line = f"{now} | User: {user}"
             padding = (self.term_width - len(status_line) - 2) // 2
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            print(colored("║", self.current_theme["header"]) + " " * padding +
+                  status_line +
+                  " " * (self.term_width - len(status_line) - 2 - padding) +
+                  colored("║", self.current_theme["header"]))
+
             print(
                 colored("║", self.current_theme["header"])
                 + " " * padding
@@ -223,6 +246,7 @@ class TerminalUI:
                 + " " * (self.term_width - len(status_line) - 2 - padding)
                 + colored("║", self.current_theme["header"])
             )
+ main
 
             print(colored("╚" + "═" * (self.term_width - 2) + "╝", self.current_theme["header"]))
 
@@ -233,6 +257,15 @@ class TerminalUI:
             plugins_enabled = ", ".join(self.config.get("plugins_enabled", []))
             status_line = f"Plugins: {plugins_enabled} | v{VERSION}"
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            self.console.print(Panel(
+                status_line,
+                border_style=self.current_theme["header"],
+                box=box.DOUBLE,
+                expand=False,
+                padding=(0, 2)
+            ))
+
             self.console.print(
                 Panel(
                     status_line,
@@ -242,6 +275,7 @@ class TerminalUI:
                     padding=(0, 2),
                 )
             )
+ main
         else:
             from termcolor import colored
 
@@ -251,6 +285,11 @@ class TerminalUI:
             # Status information
             plugins_enabled = ", ".join(self.config.get("plugins_enabled", []))
             status_line = f"Plugins: {plugins_enabled} | v{VERSION}"
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+            print(colored("║", self.current_theme["header"]) + " " + status_line +
+                  " " * (self.term_width - len(status_line) - 3) +
+                  colored("║", self.current_theme["header"]))
+
             print(
                 colored("║", self.current_theme["header"])
                 + " "
@@ -258,6 +297,7 @@ class TerminalUI:
                 + " " * (self.term_width - len(status_line) - 3)
                 + colored("║", self.current_theme["header"])
             )
+ main
 
             print(colored("╚" + "═" * (self.term_width - 2) + "╝", self.current_theme["header"]))
 
@@ -339,7 +379,10 @@ class PluginManager:
 
         return result
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
 
+
+main
 # Main CLI interface
 @click.group()
 @click.version_option(VERSION)
@@ -607,6 +650,8 @@ class Plugin:
     class Plugin:
     """A Triad Terminal plugin"""
 
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+
     def __init__(self):
         pass
     
@@ -622,10 +667,14 @@ class Plugin:
             click.echo(f"Hello from {self.name} plugin!")
 
         return [hello]
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+""".replace("PLUGIN_NAME", plugin_name))
+
 """.replace(
                 "PLUGIN_NAME", plugin_name
             )
         )
+ main
 
     if has_rich:
         Console().print(f"[bold {ui.current_theme['success']}]✅ Plugin {plugin_name} created[/]")

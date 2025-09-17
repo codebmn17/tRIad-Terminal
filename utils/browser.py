@@ -25,8 +25,13 @@ def open_url(url: str, new: int = 2, autoraise: bool = True) -> bool:
             return False
 
         # Ensure URL has a scheme
+ copilot/fix-1f51a615-a20d-476a-b14f-a5ee1cba80a2
+        if not url.startswith(('http://', 'https://', 'file://')):
+            url = 'https://' + url
+
         if not url.startswith(("http://", "https://", "file://")):
             url = "https://" + url
+main
 
         return webbrowser.open(url, new=new, autoraise=autoraise)
     except Exception:
