@@ -158,9 +158,25 @@ class SecureTerminal:
         # Add admin commands if the user is an admin
         users = self.security._load_users()
         if self.username in users and users[self.username].get("admin", False):
+ copilot/fix-c1e50cd2-35ad-4991-8bc0-a59778375133
             commands.extend(
                 [
                     {"name": "users", "description": "User management"},
                     {"name": "logs", "description": "View security logs"},
                 ]
             )
+
+            commands.extend([
+                {"name": "users", "description": "User management"},
+                {"name
+                 commands.extend([
+    {
+        "name": "users",
+        "description": "User management",
+    },
+    {
+        "name": "sessions",
+        "description": "Session handling",
+    }
+])
+ main

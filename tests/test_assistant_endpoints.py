@@ -5,6 +5,22 @@ Tests the AI assistant functionality including command prediction,
 natural language processing, code completion, and training.
 """
 
+ copilot/fix-c1e50cd2-35ad-4991-8bc0-a59778375133
+
+import pytest
+from fastapi.testclient import TestClient
+
+Test AI Assistant API endpoints.
+
+Tests the /assistant endpoints for command prediction, code completion,
+"""
+Tests the /assistant endpoints for command prediction,
+code completion, natural language processing, and feedback handling.
+"""
+
+import pytest
+import sys
+ main
 import os
 import sys
 
@@ -590,7 +606,6 @@ class TestAssistantEndpointIntegration:
         feedback_request = {
             "feedback_type": "positive",
             "context": f"Suggestion '{suggestions[0]}' was helpful",
-        }
 
         feedback_response = client.post("/assistant/feedback", json=feedback_request)
         assert feedback_response.status_code == 200

@@ -189,6 +189,32 @@ async def run_chat(agent_classes: list[type[Agent]], room: str = "main") -> None
                 Message(room=current_room, sender="you", content=line, role="user", meta=meta)
             )
 
+ copilot/fix-c1e50cd2-35ad-4991-8bc0-a59778375133
+
+    await router.post(Message(room=current_room, sender="you", content=line, role="user", meta=meta))
+
+print(color("bold", f"Triad multi-agent chat - room {room}"))
+print(color("dim", "Type your message. Ctrl+C to exit."))
+    print(color("dim", "Type your message. Ctrl+C to exit."))
+    print()
+
+    try:
+        loop = asyncio.get_event_loop()
+        while True:
+            user_text = await loop.run_in_executor(None, sys.stdin.readline)
+            if not user_text:
+                break
+            user_text = user_text.strip("\n")
+            if not user_text:
+                continue
+            
+            print(f"{color('yellow', '[you]')}: {user_text}")
+            await router.post(Message(room=room, sender="you", content=user_text, role="user"))
+            
+            # Small delay to let agents respond
+            await asyncio.sleep(0.1)
+            
+ main
     except KeyboardInterrupt:
         print("\nbye")
     finally:
