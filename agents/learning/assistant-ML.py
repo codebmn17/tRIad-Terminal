@@ -40,7 +40,27 @@ logger = logging.getLogger("triad.ai")
 
 def log_with_context(level: str, message: str, component: str, event: str, **kwargs) -> None:
     """
+    def log_with_context(level: str, message: str, component: str, event: str, **kwargs) -> None:
+    """
     Structured logging helper with context information.
+
+    Args:
+        level: log level
+        message: log message
+        component: component name
+        event: event name
+        kwargs: extra data
+    """
+    # TODO: implement
+    """
+    Structured logging helper with context information.
+
+    Args:
+        level: ...
+        message: ...
+        ...
+    """
+    # function body...
     
     Args:
         level: Log level (info, warning, error, debug)

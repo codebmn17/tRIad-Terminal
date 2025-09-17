@@ -13,9 +13,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-
+ Termux-compatibility-helpers
+from .routers import health, ml_router, assistant
+from . import ml_status
+=======
 from . import ml_status
 from .routers import assistant, health, ml_router
+ main
 
 # Import dataset routes
 try:
